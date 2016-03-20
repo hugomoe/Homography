@@ -1,0 +1,215 @@
+First some useful properties of homographies will be recalled. A homography is a bijective map of the form 
+\[h:(x,y)\ra \left(\frac{ax+by+p}{rx+sy+t},\frac{cx+dy+q}{rx+sy+t}\right)\]
+(its target set is $\mathbb R^2$ minus a straight line). Affine maps are a special case of homography, and non-affine homography domains are $\mathbb R^2$ minus a straight line. The set of homographies is a group for composition. A homography $h$ is associated with the matrix $H$,
+
+\begin{equation*}
+	H=\begin{pmatrix}
+	a&b&p\\c&d&q\\r&s&t
+	\end{pmatrix}.
+\end{equation*}
+We also set
+ \begin{equation*}
+ H^{-1}=\begin{pmatrix} \hat a&\hat b&\hat p\\ \hat c&\hat d&\hat q\\ \hat r&\hat s&\hat t \end{pmatrix}.
+ \end{equation*}
+
+\noindent $H$ is invertible since $h$ is, $H$ is not unique because $\lambda H$ corresponds to the same homography for all $\lambda \in \mathbb{R}_+$. We shall denote by $\sim$ the equivalence relation on $GL_{3}(\mathbb{R})$ defined by \[A\sim B \iff \exists \lambda\in \mathbb{R}^{*} , A=\lambda B,\] i.e $A\sim B$ if and only if they defined the same homography. 
+
+We know proceed with the proof of Theorem \ref{thepropdecomp}. 
+
+%Le but de cette partie est d'établir la théorème (\ref{thepropdecomp}).
+
+ %On rappelle d'abord les notions sur les homographies qui seront utiles dans la suite. Le lien entre les homographies et les espaces projectifs ne sera pas utlisé. On rappelle que dans ce document, une homographie $h$ est une application bijective de la forme :
+%	\[h:(x,y)\ra \left(\frac{ax+by+p}{rx+sy+t},\frac{cx+dy+q}{rx+sy+t}\right)\]
+%(l'ensemble d'arrivée est $\mathbb R^2$ privé d'une droite).
+
+%Les applications affines sont un cas particulier d'homographie ; si une homographie n'est pas une application affine alors elle est définie sur le plan privé d'une droite.
+
+%L'ensemble des homographies a une structure de groupe pour la loi de composition.
+
+%On peut associer à l'homographie $h$ la matrice $H$ définie par
+  
+
+%Cette matrice est inversible car $h$ est inversible ; elle n'est pas unique car la matrice $\lambda H$ définit la même homographie pour $\lambda \in \mathbb{R}_+$.
+
+%Cette notation rend compatible le produit matriciel et la composition des homographies. On obtient un morphisme de groupe de $GL_{3}(\mathbb{R})$ dans le groupe des homographies du plan. Ce morphisme n'est pas injectif, la matrice d'une homographie est définie à proportionnalité près, mais il se factorise à travers $SL_{3}(\mathbb{R})$ en un isomorphisme.
+
+%Dans la suite on notera $\sim$ la relation d'équivalence  sur $GL_{3}(\mathbb{R})$ définie par \[A\sim B \iff \exists \lambda\in \mathbb{R}^{*} , A=\lambda B\] c'est-à-dire si, et seulement si, $A$ et $B$ définissent la même homographie.
+
+
+\begin{proof}
+
+Let $h$ be a homography and $H$ a matrix associated to it, assuming $\det (H)=1$ without loss of generality. We want to prove that there exist parameters $(\theta,\phi,\psi,\delta,\delta',\cbf,\xbf_v)$ such that
+\begin{equation*}
+h= \tau_{\cbf} \circ z_{\frac{\delta}{\delta'}}\circ R_{\psi} \circ h_{\theta,\delta'} \circ R_{\phi} \circ \tau_{\xbf_v}.
+\end{equation*}
+
+\noindent Since every transform in the decomposition is an homography, it can be written in matrix form as well. So we want $(\theta,\phi,\psi,\delta,\delta',\cbf,\xbf_v)$ such that
+ \begin{equation*}
+H\sim T_{\cbf} Z_{\frac{\delta}{\delta'}}  R_{\psi}  H_{\theta,\delta'} R_{\phi}  T_{\xbf_v},
+\end{equation*}
+with
+\begin{equation*}
+R_{\alpha}=\begin{pmatrix}
+\cos(\alpha)&\sin(\alpha)&0\\-\sin(\alpha)&cos(\alpha)&0\\0&0&1
+\end{pmatrix}
+, H_{\theta,\delta'}=\begin{pmatrix}
+-\cos(\theta)&0&0\\0&-1&0\\-\frac{\sin(\theta)}{\delta'}&0&1
+\end{pmatrix},
+\end{equation*}
+\begin{equation*}
+Z_{\lambda}=\begin{pmatrix}
+\lambda&0&0\\0&\lambda&0\\0&0&1
+\end{pmatrix}
+\text{ and } T_{(a,b)}=\begin{pmatrix}
+1&0&-a\\0&1&-b\\0&0&1
+\end{pmatrix}.
+\end{equation*}
+First the translations are determined. Let $(x_1 , y_1 )$ and $(x_2 , y_2 )$ be two vectors and denote by $H_t$ the matrix $T_{-(x_2 , y_2 )}  \cdot H \cdot T_{(x_1 , y_1 )}$. Let's determine $(x_1 , y_1 )$ and $(x_2 , y_2 )$ in such a way that there are  $(\theta,\phi,\psi,\delta,\delta')$ such that $H_t=Z_{\frac{\delta}{\delta'}} \cdot R_{\psi} \cdot H_{\theta,\delta} \cdot R_{\phi}$.
+
+\noindent A straightforward computation shows that $(\theta,\phi,\psi,\delta,\delta')$ the matrix $Z_{\frac{\delta}{\delta'}} \cdot R_{\psi} \cdot H_{\theta,\delta} \cdot R_{\phi}$  is equal to 
+
+  \begin{equation*}
+\begin{pmatrix}
+ -\frac{\delta}{\delta'}\cos(\psi)\cos(\theta)\cos(\phi)+\frac{\delta}{\delta'}\sin(\psi)\sin(\phi)& -\frac{\delta}{\delta'}\cos(\psi)\cos(\theta)\sin(\phi)-\frac{\delta}{\delta'}\sin(\psi)\cos(\phi)&0\\
+  \frac{\delta}{\delta'}\sin(\psi)\cos(\theta)\cos(\phi)+\frac{\delta}{\delta'}\cos(\psi)\sin(\phi)& \frac{\delta}{\delta'}\sin(\psi)\cos(\theta)\sin(\phi)-\frac{\delta}{\delta'}\cos(\psi)\cos(\phi)&0\\ -\frac{\sin(\theta)}{\delta'}\cos(\phi)&-\frac{\sin(\theta)}{\delta'}\sin(\phi)& 1
+ \end{pmatrix},
+ \end{equation*}
+
+\noindent and that for all $(x_1,y_1,x_2,y_2)$
+
+ \begin{equation*}
+ H_t=\begin{pmatrix}
+ a-x_2 r&b-x_2 s& a x_1 + b y_1 + p -x_2 (r x_1 +s y_1 +t)\\
+  c-y_2 r&d-y_2 s& c x_1 + d y_1 + q -y_2 (r x_1 +s y_1 +t)\\
+  r & s & r x_1 + s y_1 +t
+ \end{pmatrix},
+ \end{equation*}
+ 
+ \noindent so 
+ 
+ \begin{equation*}
+ (H_t)_{1,3}=(H_t)_{2,3}=0 \iff (x_2,y_2)=h(x_1,y_1) \iff (x_1,y_1)=h^{-1}(x_2,y_2).
+ \end{equation*}
+
+\noindent Assume that $(x_1,y_1)=h^{-1}(x_2,y_2)$ to simplify the intermediate calculations and assume that $(x_2,y_2)$ satisfies $\hat r x_2 +\hat s y_2 + \hat t \ne 0$.
+
+\noindent We have 
+ \begin{equation*}
+H_t
+  \sim 
+  \begin{pmatrix}
+ (a-x_2 r)(\hat r x_2 + \hat s y_2 +\hat t)&(b-x_2 s)(\hat r x_2 + \hat s y_2 +\hat t)& 0\\
+  (c-y_2 r)(\hat r x_2 + \hat s y_2 +\hat t)&(d-y_2 s)(\hat r x_2 + \hat s y_2 +\hat t)& 0\\
+  r(\hat r x_2 + \hat s y_2 +\hat t) & s(\hat r x_2 + \hat s y_2 +\hat t) &1
+  \end{pmatrix}
+\end{equation*}
+and
+  \begin{equation*}
+ -\frac{\sin(\theta)}{\delta'}\cos(\phi)=r(\hat r x_2 + \hat s y_2 +\hat t)\text{ and } -\frac{\sin(\theta)}{\delta'}\sin(\phi)=s(\hat r x_2 + \hat s y_2 +\hat t).
+ \end{equation*}
+ 
+ \noindent Notice that $r^{2}+s^{2}=0$ if and only if $h$ is an affinity. This case will be treated independently, it is assumed here that $h$ is not affine. So it can be assumed that
+ \begin{eqnarray*}
+ \cos(\psi) &=& \sgn\left(-\frac{\sin(\theta)}{ \delta'}\right)\sgn(\hat r x_2 + \hat s y_2 +\hat t)\frac{r}{\sqrt{r^{2}+s^{2}}},\\
+ \sin(\psi) &=& \sgn\left(-\frac{\sin(\theta)}{ \delta'}\right)\sgn(\hat r x_2 + \hat s y_2 +\hat t)\frac{s}{\sqrt{r^{2}+s^{2}}}.
+ \end{eqnarray*}
+ Assuming $\frac{\sin(\theta)}{\delta'}>0$ can be done without loss of generality because if $\frac{\sin(\theta)}{\delta'}<0$ then  \begin{equation*}
+ R_{\psi} \cdot H_{\theta,\delta'} \cdot R_{\phi}=R_{\psi} \cdot Z_{-1}\cdot H_{\theta,-\delta'}\cdot Z_{-1} \cdot R_{\phi}= R_{\psi+\pi} \cdot H_{\theta,-\delta'}\cdot R_{\phi+\pi},
+ \end{equation*}
+ and  $-\frac{\sin(\theta)}{\delta'}>0$. So
+ \begin{equation*}
+ \cos( \phi )= -\sgn(\hat r x_2 +\hat s y_2 +\hat t) \frac{r}{\sqrt{r^2 + s^2}} \text{ and } \sin( \phi )= -\sgn(\hat r x_2 +\hat s y_2 +\hat t) \frac{s}{\sqrt{r^2 + s^2}}.
+ \end{equation*}
+ 
+ 
+ Since on the one hand
+ \begin{equation*}
+ H_t \cdot R_{\phi}^{-1} \sim
+ \begin{pmatrix}
+ -|\hat r x_2 +\hat s y_2 +\hat t|\frac{(ar+sb)-(r^2 + s^2)x_2}{\sqrt{r^2 + s^2}}&-|\hat r x_2 +\hat s y_2 +\hat t|\frac{\hat s}{\sqrt{r^2 + s^2}}&0\\
+ -|\hat r x_2 +\hat s y_2 +\hat t|\frac{(cr+sd)-(r^2 + s^2)y_2}{\sqrt{r^2 + s^2}}&|\hat r x_2 +\hat s y_2 +\hat t|\frac{r}{\sqrt{r^2 + s^2}}&0\\
+ -|\hat r x_2 +\hat s y_2 +\hat t|\sqrt{r^2 + s^2}&0&1
+ \end{pmatrix},
+ \end{equation*}
+and on the other hand
+ \begin{equation*}
+Z_{\frac{\delta}{\delta'}} \cdot R_{\psi} \cdot H_{\theta,\delta}  \sim 
+ \begin{pmatrix}
+ -\frac{\delta}{\delta'}\cos(\psi)\cos(\theta)&
+-\frac{\delta}{\delta'}\sin(\psi)&
+0\\
+\frac{\delta}{\delta'}\sin(\psi)\cos(\theta)&
+-\frac{\delta}{\delta'}\cos(\psi)&
+0\\
+-\frac{\sin(\theta)}{\delta'}&
+0&
+1
+ \end{pmatrix},
+ \end{equation*}
+finally noting $h$ is not an affinity so we have $\hat r^2 + \hat s^2 \ne 0$, we obtain by identification 
+ \begin{equation*}
+  \cos( \psi ) =- \sgn(\frac{\delta}{\delta'})\frac{\hat r}{\sqrt{\hat r^2 + \hat s^2}}\text{ and } \sin( \psi ) = \sgn(\frac{\delta}{\delta'})\frac{\hat s}{\sqrt{\hat r^2 + \hat s^2}}.
+ \end{equation*}
+ 
+\noindent It can be assumed that $\frac{\delta}{\delta'}>0$ without loss of generality since
+if $\frac{\delta}{\delta'}<0$ then $Z_{\frac{\delta}{\delta'}} \cdot R_{\psi}=Z_{\left|\frac{\delta}{\delta'}\right|}\cdot Z_{-1} \cdot R_{\psi}=Z_{\left|\frac{\delta}{\delta'}\right|}\cdot R_{\pi} \cdot R_{\psi}=Z_{\left|\frac{\delta}{\delta'}\right|}\cdot R_{\psi+\pi}$.
+
+\noindent Thus,
+ \begin{equation*}
+  \cos( \psi ) =- \frac{\hat r}{\sqrt{\hat r^2 + \hat s^2}} \text{ et } \sin( \psi ) = \frac{\hat s}{\sqrt{\hat r^2 + \hat s^2}},
+ \end{equation*}
+
+\noindent and
+\begin{equation*}
+R_{\psi}^{-1} \cdot H_t \cdot R_{\phi}^{-1} \sim 
+ \begin{pmatrix}
+ -|\hat r x_2 +\hat s y_2 +\hat t|(\hat r x_2 +\hat s y_2 +\hat t)\sqrt{\frac{r^2 + s^2}{\hat r^2 + \hat s^2}}&0&0\\
+ |\hat r x_2 +\hat s y_2 +\hat t|\frac{\Delta_H(x_2 , y_2)}{\sqrt{r^2 + s^2}\sqrt{\hat r^2 + \hat s^2}}&-|\hat r x_2 +\hat s y_2 +\hat t|\sqrt{\frac{\hat r^2 + \hat s^2}{r^2 + s^2}}&0\\
+ -|\hat r x_2 +\hat s y_2 +\hat t|\sqrt{r^2 + s^2}&0&1
+ \end{pmatrix}
+\end{equation*}
+where 
+\begin{equation*}
+\Delta_H(x_2 , y_2 ) =\hat r ((rc+sd)-(r^2 + s^2)y_2) - \hat s ((ar+sb)-(r^2 + s^2 )x_2).
+\end{equation*}
+Solutions of $\Delta_H(x_2 , y_2 )=0$ are 
+\[ \left\lbrace \left( x_2=\frac{ar+sb+ \hat r \lambda}{r^2 +s^2}, y_2=\frac{cr+sd+\hat s \lambda}{r^2 +s^2}\right), \lambda \in \mathbb R \right\rbrace.\]
+In this case
+\begin{equation*}
+\hat r x_2 +\hat s y_2 +\hat t = \frac{\hat r^2 +\hat s^2}{r^2 + s^2} \lambda.
+\end{equation*}
+
+\noindent Thus the parameter $\lambda$ has to be different from zero since
+\begin{equation*}
+R_{\psi}^{-1} \cdot H_t \cdot R_{\phi}^{-1} \sim 
+ \begin{pmatrix}
+ -| \lambda | \lambda \sqrt{\frac{\hat r^2 + \hat s^2}{s^2 + r^2}}^{3}&0&0\\
+0&-| \lambda | \sqrt{\frac{\hat r^2 + \hat s^2}{r^2 + s^2}}^{3}&0\\
+ -|\lambda|\frac{\hat r^2 + \hat s^2}{\sqrt{r^2 + s^2}}&0&1
+ \end{pmatrix}.
+\end{equation*}
+ 
+ 
+\noindent Let us set
+ \begin{equation*}
+ \frac{\delta}{\delta'}=|\lambda|\sqrt{\frac{\hat r^2 + \hat s^2}{r^2 + s^2}}^{3}.
+ \end{equation*}
+Finally
+\begin{equation*}
+Z_{\frac{\delta}{\delta'}}^{-1} \cdot R_{\psi}^{-1} \cdot H_t \cdot R_{\phi}^{-1} \sim 
+ \begin{pmatrix}
+ -\lambda&0&0\\
+0&-1&0\\
+ -|\lambda|\frac{\hat r^2 + \hat s^2}{\sqrt{r^2 + s^2}}&0&1
+ \end{pmatrix}.
+ \end{equation*}
+ 
+\noindent This matrix has to be of the form $H_{\theta,\delta'}$. In order to have that, it is sufficient to have
+ \begin{equation*}
+  \lambda^2 + \lambda^2 \delta'^2 \frac{(\hat r^2 + \hat s^2)^2}{r^2 + s^2}=1,
+ \end{equation*}
+\noindent which lead us to set
+ \begin{equation*}
+  \delta'^2 = (r^2 + s^2) \frac{1-\lambda^2}{\lambda^2 (\hat r^2+\hat s^2)^2}.
+ \end{equation*}
+\end{proof}

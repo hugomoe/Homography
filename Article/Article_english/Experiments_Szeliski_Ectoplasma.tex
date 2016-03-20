@@ -1,0 +1,136 @@
+Our experiments were implemented in C. First the spectral behaviour of the multi-pass resampling method for an affine transform was checked. Then the new geometric method was compared to the Ripmap.
+
+%On présente ici des expériences réalisées en C. On vérifie d'abord le comportement spectral du traitement multi-étape d'une affinité. On compare ensuite la nouvelle méthode au Ripmap.
+
+\subsection{Multi-pass resampling method for an affine transform}
+
+%\subsection{Décomposition multi-étapes d'une affinité}
+ 
+ 
+ The results of multi-pass resampling method for an affine transform \cite{szeliski2010high} (part \ref{szeliski_section}) as well as the image's spectrum at the successive steps are examined in this section. The affine transform being here a shear, the decomposition has three basic steps, instead of four for a general affine transform.  
+ 
+ %On présente ici les résultats de la décomposition multi-étapes d'une affinité \cite{szeliski2010high} (section \ref{szeliski_section}), ainsi que le spectre de l'image aux différentes étapes. L'affinité utilisée étant elle-même un \emph{shear}, la décomposition se réduit à trois étapes élémentaires, au lieu des quatres d'une affinité quelconque.
+ \begin{figure}
+		\centering
+		\subfigure[Initial image (scale 3/8)]{
+			{\includegraphics[scale=0.375]{decompoSzeliski_sinc_image_entree.png}}
+			{\includegraphics[scale=0.375]{decompoSzeliski_sinc_fourier_entree.png}}
+		}
+		\subfigure[Initial image in a nine times larger one (scale 1/8)]{
+			{\includegraphics[scale=0.125]{decompoSzeliski_sinc_image1.png}}
+			{\includegraphics[scale=0.125]{decompoSzeliski_sinc_fourier1.png}}
+		}
+		\subfigure[After the first $\mathcal R$ (scale 1/8)]{
+			{\includegraphics[scale=0.125]{decompoSzeliski_sinc_image2.png}}
+			{\includegraphics[scale=0.125]{decompoSzeliski_sinc_fourier2.png}}
+		}
+		\subfigure[After the second $\mathcal R$ (scale 1/8)]{
+			{\includegraphics[scale=0.125]{decompoSzeliski_sinc_image3.png}}
+			{\includegraphics[scale=0.125]{decompoSzeliski_sinc_fourier3.png}}
+		}
+		\subfigure[After the third $\mathcal R$ (scale 1/8)]{
+			{\includegraphics[scale=0.125]{decompoSzeliski_sinc_image4.png}}
+			{\includegraphics[scale=0.125]{decompoSzeliski_sinc_fourier4.png}}
+		}
+		\subfigure[Final image (scale 3/8)]{
+			{\includegraphics[scale=0.375]{decompoSzeliski_sinc_image_sortie.png}}
+			{\includegraphics[scale=0.375]{decompoSzeliski_sinc_fourier_sortie.png}}
+		}
+		\caption{Steps of the multi-pass resampling method for an affine transform explained in section \ref{szeliski_section} (on the left is the image at each steps, on the right is the logarithm of the modulus of the Fourier transform of this image). The interpolation filter is a sinc function (with period 1). To appreciate the quality of the final result it is advised to zoom  it in by a factor 3.}
+		\label{experiments_decompoSzeliski_sinc}
+	\end{figure}
+	%\begin{figure}
+	%	\centering
+	%	\subfigure[Image initiale (échelle 3/8)]{
+	%		{\includegraphics[scale=0.375]{decompoSzeliski_sinc_image_entree.png}}
+	%		{\includegraphics[scale=0.375]{decompoSzeliski_sinc_fourier_entree.png}}
+	%	}
+	%	\subfigure[Image plongée dans une image neuf fois plus grande (échelle 1/8)]{
+	%		{\includegraphics[scale=0.125]{decompoSzeliski_sinc_image1.png}}
+	%		{\includegraphics[scale=0.125]{decompoSzeliski_sinc_fourier1.png}}
+	%	}
+	%	\subfigure[Après le premier $\mathcal R$ (échelle 1/8)]{
+	%		{\includegraphics[scale=0.125]{decompoSzeliski_sinc_image2.png}}
+	%		{\includegraphics[scale=0.125]{decompoSzeliski_sinc_fourier2.png}}
+	%	}
+	%	\subfigure[Après le deuxième $\mathcal R$ (échelle 1/8)]{
+	%		{\includegraphics[scale=0.125]{decompoSzeliski_sinc_image3.png}}
+	%		{\includegraphics[scale=0.125]{decompoSzeliski_sinc_fourier3.png}}
+	%	}
+	%	\subfigure[Après le troisième $\mathcal R$ (échelle 1/8)]{
+	%		{\includegraphics[scale=0.125]{decompoSzeliski_sinc_image4.png}}
+	%	}
+	%	\subfigure[Image finale (échelle 3/8)]{
+	%		{\includegraphics[scale=0.375]{decompoSzeliski_sinc_image_sortie.png}}
+	%		{\includegraphics[scale=0.375]{decompoSzeliski_sinc_fourier_sortie.png}}
+	%	}
+	%	\caption{Étapes du traitement des affinités présenté en \ref{szeliski_section} (à gauche l'image à chaque étape, à droite le logarithme du module de la transformée de Fourier de cette image). Le filtre d'interpolation est un \emph{sinc} (de période 1)}
+	%	\label{experiments_decompoSzeliski_sinc}
+	%\end{figure}
+	For figure \ref{experiments_decompoSzeliski_sinc}, we used  a raised cosine-weighted sinc filter of the form (see formula \eqref{szeliski_definition_raisedCosineWeightedSinc}) 
+		\[h : x \mapsto \sinc(\frac{x}{T})\frac{\cos(\frac{\pi\beta x}{T})}{1-\frac{4\beta^2x^2}{T^2}}\].
+		There is no loss of visual quality if one reduces the convolution with this filter to a large enough finite number of terms.
+		
+	%En figure \ref{experiments_decompoSzeliski_sinc}, le filtre utilisé est un \emph{sinc}, correspondant au \emph{raised cosine-weighted sinc} avec $\beta = 0$ ; pour rappel, le filtre a pour forme
+	%\[h : x \mapsto \sinc(\frac{x}{T})\frac{\cos(\frac{\pi\beta x}{T})}{1-\frac{4\beta^2x^2}{T^2}}\]
+	%On ne perd pas en qualité visuelle en réduisant la convolution à un nombre fini de termes suffisamment grand.
+
+ 	\begin{figure}
+		\centering
+		\subfigure[Initial image (scale 3/8)]{
+			{\includegraphics[scale=0.375]{decompoSzeliski_image_entree.png}}
+			{\includegraphics[scale=0.375]{decompoSzeliski_fourier_entree.png}}
+		}
+		\subfigure[Inital image in a nine times larger one (scale 1/8)]{
+			{\includegraphics[scale=0.125]{decompoSzeliski_image1.png}}
+			{\includegraphics[scale=0.125]{decompoSzeliski_fourier1.png}}
+		}
+		\subfigure[After the first $\mathcal R$ (scale 1/8)]{
+			{\includegraphics[scale=0.125]{decompoSzeliski_image2.png}}
+			{\includegraphics[scale=0.125]{decompoSzeliski_fourier2.png}}
+		}
+		\subfigure[After the second $\mathcal R$ (scale 1/8)]{
+			{\includegraphics[scale=0.125]{decompoSzeliski_image3.png}}
+			{\includegraphics[scale=0.125]{decompoSzeliski_fourier3.png}}
+		}
+		\subfigure[After the third $\mathcal R$ (scale 1/8)]{
+			{\includegraphics[scale=0.125]{decompoSzeliski_image4.png}}
+			{\includegraphics[scale=0.125]{decompoSzeliski_fourier4.png}}
+		}
+		\subfigure[Final image (Scale 3/8)]{
+			{\includegraphics[scale=0.375]{decompoSzeliski_image_sortie.png}}
+			{\includegraphics[scale=0.375]{decompoSzeliski_fourier_sortie.png}}
+		}
+		\caption{Steps of the multi-pass resampling method for an affine transform explained in section \ref{szeliski_section} (on the left is the image at each step, on the right is the logarithm of the modulus of the Fourier transform of this image). The interpolation filter is a raised cosine-weighted sinc (with period 1 and with a roll-off factor $\beta = 0.25$).To appreciate the quality of the final result it is advised to zoom  it in by a factor 3. Compare with Figure \ref{experiments_decompoSzeliski_sinc}.}
+		\label{experiments_decompoSzeliski}
+	\end{figure}
+
+	%\begin{figure}
+	%	\centering
+	%	\subfigure[Image initiale (échelle 3/8)]{
+	%		{\includegraphics[scale=0.375]{decompoSzeliski_image_entree.png}}
+	%		{\includegraphics[scale=0.375]{decompoSzeliski_fourier_entree.png}}
+	%	}
+	%	\subfigure[Image plongée dans une image neuf fois plus grande (échelle 1/8)]{
+	%		{\includegraphics[scale=0.125]{decompoSzeliski_image1.png}}
+	%		{\includegraphics[scale=0.125]{decompoSzeliski_fourier1.png}}
+	%	}
+	%	\subfigure[Après le premier $\mathcal R$ (échelle 1/8)]{
+	%		{\includegraphics[scale=0.125]{decompoSzeliski_image2.png}}
+	%		{\includegraphics[scale=0.125]{decompoSzeliski_fourier2.png}}
+	%	}
+	%	\subfigure[Après le deuxième $\mathcal R$ (échelle 1/8)]{
+	%		{\includegraphics[scale=0.125]{decompoSzeliski_image3.png}}
+	%		{\includegraphics[scale=0.125]{decompoSzeliski_fourier3.png}}
+	%	}
+	%	\subfigure[Après le troisième $\mathcal R$ (échelle 1/8)]{
+	%		{\includegraphics[scale=0.125]{decompoSzeliski_image4.png}}
+	%		{\includegraphics[scale=0.125]{decompoSzeliski_fourier4.png}}
+	%	}
+	%	\subfigure[Image finale (échelle 3/8)]{
+	%		{\includegraphics[scale=0.375]{decompoSzeliski_image_sortie.png}}
+	%		{\includegraphics[scale=0.375]{decompoSzeliski_fourier_sortie.png}}
+	%	}
+	%	\caption{Étapes du traitement des affinités présenté en \ref{szeliski_section} (à gauche l'image à chaque étape, à droite le logarithme du module de la transformée de Fourier de cette image). Le filtre d'interpolation est un \emph{raised cosine-weighted sinc} (de période 1, de \emph{roll-off factor} $\beta = 0.25$)}
+	%	\label{experiments_decompoSzeliski}
+	%\end{figure}

@@ -1,0 +1,17 @@
+% contient l'introduction
+
+A homography is a projective mapping on the plane simulating the effect  on an image of a camera rotation around its optical center. 
+
+
+
+Therefore homographies are systematically used in computer graphics for texturing scenes in video games and animation \cite{heckbert1983texture}, and in image  processing for panoramic image stitching \cite{brown2007automatic}. It is not easy to resample an image by a homography because it may involve a zoom-in or a zoom-out depending on the area of the image. Aliasing and over-blur must also be avoided. Because of the necessity of zooming-out some parts, splines can't be used systematically for the resampling. In the current technology, homographies are often resampled by the Mipmap method \cite{williams1983pyramidal} or by variants of this method. Sometimes Mipmap is combined with multiple-sample anisotropic filtering  \cite{barkans1997high}. The use of the Mipmap makes it possible to zoom-out some parts of the image; however it sometimes produces a considerable aliasing. Other filters such as the Elliptic Weighted Average (EWA) directly convolve the image with a Gaussian filter \cite{greene1986creating}. Unfortunately Gaussian filtering is known to create aliasing and to overblur. Besides this filter is isotropic in the warped coordinates, and it incorrectly filters out corner frequencies in the spectrum. In addition the use of the EWA filter takes a considerable time, even if faster algorithms based on Mipmapping have been developed \cite{mccormack1999feline,huttner1999fast}. The new resampling method presented in this article will be compared (in the experimental part) to an anisotropic variant of the Mipmap called the Ripmap which is describe in \cite{akenine2008real}.
+
+	An efficient method to resample affine transforms, which are a particular case of homographies, has been recently developed in \cite{szeliski2010high}, which mentioned that this efficient method could be adapted to homographies. Inspired by this suggestion, the present paper describes a new method which makes it possible to resample any homography thanks to a decomposition of the homography involving affine transforms. It permits to reuse the above mentioned efficient affine resampling. Compared to the Ripmap, our new method reduces blur and aliasing. It is nevertheless slightly slower.
+	
+	Part \ref{szeliski_section} presents the affine resampling method which will be used in our  proposed decomposition.
+		
+	Part \ref{decomp_geo_hom} describes the proposed geometric decomposition of homographies and details how to resample the special homography coming from that decomposition.
+	
+	Part \ref{experiences} compares the new resampling method to pre-existing ones and shows that the new one reduces blur and aliasing.
+	
+	Algorithms describing the new method are given in appendix.	

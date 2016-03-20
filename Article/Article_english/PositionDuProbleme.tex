@@ -1,0 +1,25 @@
+% contient une exposition du problème (description d'une homographie, source du problème, intérêt du problème, problématique, raison pour laquelle on se bat dans la vie, etc...)
+
+
+
+\label{pospb}
+	Cet article présente une méthode permettant de déformer une image par une homographie en limitant l'apparition de défauts.
+	
+	\begin{Def}
+ 	Une homographie $h$ est une déformation du plan qui transforme les droites en droites ; elle est déterminée par 8 paramètres et s'écrit sous la forme :
+	\[h : (x,y)\mapsto\left( \frac{ax+by+p}{rx+sy+t},\frac{cx+dy+q}{rx+sy+t}\right)\]
+	\label{definition_homographie}
+	\end{Def}
+On peut voir l'effet d'une homographie figure \ref{effethom}.\\
+
+ \begin{figure}
+ 
+   \centering
+   \subfigPDP{I(x,y)}{hom_before.png}
+    \arrowPDP 
+   \subfigPDP{I(h(x,y))}{hom_after.png}
+   \caption{Effet d'une homographie (cf partie \ref{pospb})}
+\label{effethom}
+ \end{figure}
+
+

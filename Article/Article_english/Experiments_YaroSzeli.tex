@@ -1,0 +1,73 @@
+%\subsubsection*{Comparaison entre la méthode de Yaroslavsky et la méthode de traitement des affinités multi-étapes}
+
+\subsection{Comparison between Yaroslavsky's method and the multi-pass resampling method}
+
+	In the following experiments, the RMSE (Root Mean Square Error) is the $L^2$ norm of the difference between the initial image and the final image, the MAE (Mean Absolute Error) is the $L^1$ norm of this difference and the maximal error is the maximum ($L^\infty$ norm) of this difference.\\
+
+
+There are numerous methods to process the two rotations of the geometric decomposition. In addition to the multi-pass resampling method for affine maps \cite{szeliski2010high}, the method in Fourier due to Yaroslavky \cite{unser1995convolution} is well-known for its efficiency. They are compared through an experiment figure \ref{rotalena} : beginning from the original image, 10 rotations of 36 degrees are processed using different methods (including the naive linear interpolation).
+
+ \begin{figure}[h!]
+   \centering
+   \subfigPDP{original lena.png}{lena.png}
+   \subfigPDP{lena.png after 10 rotations by linear interpolation}{linear_10rot_lena.png}
+   \subfigPDP{lena.png after 10 rotations by the multi-pass resampling method (interpolation filter : raised cosine-weighted sinc)}{lena_10_rotations_szeli.png}
+   \subfigPDP{lena.png after 10 rotations by Yaroslasky's method}{lena_10_rotations_yaro.png}
+   \subfigPDP{difference between lena.png and lena.png after ten rotations by multi-pass resampling method (interpolation filter : raised cosine-weighted sinc)}{raised-cosine_beta0_36_10rot_lena_error.png}
+   \subfigPDP{difference between lena.png and lena.png after 10 rotations by Yaroslasky's method}{lena_10_rotations_yaro_error.png}
+ \subfigure[Errors on 10 rotations of 36 degrees]{\begin{tabular}{|c|c|c|c|c|}
+  \hline
+  Method & RMSE  & MAE & maximal error  \\
+  \hline
+  linear interpolation & 14.722 & 8.5485 & 147.43  \\
+  Yaroslavsky's method & 12.817 & 7.3749 & 159.84  \\
+  multi-pass resampling &   \bf{5.9791} & \bf{3.6243} & \bf{72.129} \\
+  \hline
+ \end{tabular}}
+ \caption{Effect for 10 rotations (see section \ref{pleinsderotations})}
+ \label{rotalena}
+ \end{figure}
+ 
+ The multi-pass resampling method using raised cosine-weighted sinc as interpolation filter and Yaroslavsky's method seem perfect.\\
+
+	To enhance the difference between rotation methods, and to mesure significant differences between computation duration, this experiment were redone but in an extreme case : 360 rotations of 1 degree were performed on the same image. The results are not significant in terms of practical issues (the geometric decomposition use at most two rotations), but they show how much information of the image is preserved through each method. The results are presented in figure \ref{troiscentrotations}.
+	
+	The implemented multi-pass resampling method does not resist that many rotations, but it can also be modified by replacing the method of interpolation. For example, one could think of replacing convolutions with a raised cosine-weighted sinc by interpolations with splines.
+In theory, it is not correct to use splines as interpolator in the multi-pass method since the decompositon has been conceived for filtering with $h(\frac{\dot{}}{s})$ which has a variable support (splines can not take into account the parameter $s$, and thus can not filter frequencies beyond the maximal preserved frequencies $u_{max}$ and $v_{max}$). However, in the case of rotations, $u_{max}=v_{max}=1$, so there is no need to filter beyond those frequencies. Moreover, if the rotation has a small angle, $r_v$ and $r_h$ are close to 1, so $s$ has very little impact on the support of the convolution. Thus, the use of splines is not a problem anymore.
+
+\label{pleinsderotations}
+
+ \begin{figure}[h!]
+ \centering
+   \subfigPDP{original lena.png}{lena.png}
+   \subfigPDP{lena.png after 360 rotations by linear interpolation}{linear_lena.png}
+   \subfigPDP{lena.png after 360 rotations by the multi-pass resampling method (interpolation filter : raised cosine-weighted sinc)}{raised-cosine_beta0-36_lena.png}
+   \subfigPDP{lena.png after 360 rotations by the multi-pass resampling method (interpolation by B-spline of order 3)}{b-spline_order3_lena.png}
+   \subfigPDP{lena.png after 360 rotations by the multi-pass resampling method (interpolation by B-spline of order 9)}{b-spline_order9_double_lena.png}
+   \subfigPDP{lena.png after 360 rotations with Yaroslasky's method}{lena_360_rotations_yaro.png}
+  
+ \subfigure[Errors on the 360 rotations of 1 degree]{\begin{tabular}{|c|c|c|c|c|}
+  \hline
+  Method & RMSE  & MAE & maximal error & duration (s) \\
+  \hline
+  linear interpolation & 38.090 & 27.526 & 184.13 &  \bf{17.909}\\
+  multi-pass resampling, b-spline of order 9 & \bf{6.8430} &  \bf{4.0370} & \bf{86.855} &  6114.1\\
+  multi-pass resampling, b-spline of order 3 & 14.869 & 8.5208 & 158.04 & 1268.1\\
+  Yaroslavsky & 14.187 & 7.7791 & 211.17 & 1839.9 \\
+  multi-pass resampling, raised cosine-weighted sinc &  828.85 & 503.15 & 13638 & 778.42\\
+  \hline
+\end{tabular}} 
+\caption{Resampling error after applying 360 rotations of 1 degree}
+\label{troiscentrotations}
+ \end{figure}
+\ \\
+
+	Even if Yaroslavsky's method had larger errors than multi-pass resampling method on 10 rotations (figure \ref{rotalena}), its errors on 360 rotations are of the same scale. It proves that Yaroslavsky's method preserves the information contained on the image, even if on few rotations the result is less correct.
+	
+	The errors of the multi-pass resampling method proves that the use of the raised cosine-weighted sinc introduces few aliasing at each rotation, but this aliasing is negligeable in practice, especially in the geometric decomposition which uses only two rotations.\\
+
+	Computationnally, Yaroslavksy's method is more expensive ($O(n \log(n))$, $n$ the number of pixels) than the multi-pass resampling method ($O(n)$). Thus, for large-sized images, the multi-pass resampling method is better.\\
+	
+	In the following experiments, the multi-pass resampling method has been chosen, since it is quiet fast and gives the best results on few rotations.
+	
+	The convolution must not be replaced by b-spline interpolation unless the computation time is less important and the rotations are ensured to have small angles, which is not the general case for geometric decomposition.

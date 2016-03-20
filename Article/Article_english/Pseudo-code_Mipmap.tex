@@ -1,0 +1,152 @@
+%pseudo-code mipmap/ripmap
+%Hugo s'en charge
+
+
+\label{pseudo_code_Ripmap}
+
+
+\sse{Conventions}
+
+The Ripmap $R$ is four-dimensional  : the two first indices indicate which rectangle is considered, the other two are the coordinated in the rectangle. So $R[2][4]$ is an image of width $\frac{1}{2}$ and heights $\frac{1}{16}$ of the input image. The input image is assumed to be a square of size $n=2^l$.
+
+
+%The Ripmap $R$ is quadri-dimensional  : les deux premiers indices indiquent le rectangle, les deux autres indiquent le pixel du rectangle. Ainsi appeler $R[2][4]$ appelle une image simple, de largeur $\frac{1}{2}$ et de hauteur $\frac{1}{16}$ de l'image d'origine. On suppose l'image de départ carrée de taille $n=2^l$.
+
+\sse{The  Ripmap pseudocodes}
+
+%\sse{Pseudo-code pour le Ripmap}
+
+\medbreak
+\medbreak
+\begin{algorithm}[H]
+\caption{$mainFunction(img,H,img_f)$, the main function}
+\KwData{An input image $img[1..n][1..n]$, a homography $H = \left( \begin{array}{ccc} a &b & p\\ c & d & q \\ r & s & t\\ \end{array}\right)$, an output image $img_f[1..m][1..m]$}
+$R = buildRipMap(img)$\tcc*{Algorithm \ref{buildRipmap2}}
+Compute the inverse homography $H^{-1}$ (and precompute the functions $\frac{\dr u}{\dr x},\frac{\dr u}{\dr y},\frac{\dr v}{\dr x},\frac{\dr v}{\dr y}$ of $x,y$ at the same time)\;
+\For{$(x,y) \in \llb 1,m \rrb^2$}{
+Compute $d_1=|\frac{\dr u}{\dr x}(x,y)|+|\frac{\dr u}{\dr y}(x,y)|$\;
+Compute $d_2=|\frac{\dr v}{\dr x}(x,y)|+|\frac{\dr v}{\dr y}(x,y)|$\tcc*{see figure \ref{methode_distance_ripmap} }
+Compute $c_1 = \min(0,\frac{\dr u}{\dr x}(x,y))+\min(0,\frac{\dr u}{\dr y}(x,y))$\;
+Compute $c_2 = \min(0,\frac{\dr v}{\dr x}(x,y))+\min(0,\frac{\dr v}{\dr y}(x,y))$\;
+$img_f[x][y] = evalPixel(H^{-1}(x,y)+(c_1,c_2),d_1,d_2,R)$\tcc*{Algorithm \ref{interbibi1}}
+}
+\KwRet{I}
+\end{algorithm}
+
+\medbreak
+\medbreak
+\medbreak
+\medbreak
+
+\begin{algorithm}[H]
+\caption{$evalPixel((u,v),d_1,d_2,M)$, the bilinear interpolation between the rectangular images as described in section \ref{Ripmap}.
+The auxiliary variables $m_{ij}$ are used here to unify the notation to cope with the cases where the distances $d_1$ and $d_2$  reach their upper or lower bounds.}
+\label{interbibi1}
+\KwData{Two coordinates $(u,v) \in \mb{R}^2$, two distances $d_1,d_2 \in \mb{R}$, a Ripmap $R[1..l][1..l]$ made of rectangular images}
+\For{$i\in \llb 1,2\rrb$}{
+$x_i = \floor{\log_2(d_i)}$\;
+\uIf{$x_i \leq 0$}{$m_{i1}=m_{i2} = 0$\;}
+\uElseIf{$x_i\geq l-1$}{$m_{i1}=m_{i2}=l-1$\;}
+\Else{$m_{i1} = x_i -1$ \;$m_{i2} = x_i$\;}
+}
+$u_1=\frac{u-(2^{m_{11}}-1)/2}{2^{m_{11}}}$\;
+$u_2=\frac{u-(2^{m_{12}}-1)/2}{2^{m_{12}}}$\;
+$v_1=\frac{v-(2^{m_{21}}-1)/2}{2^{m_{21}}}$\;
+$v_2=\frac{v-(2^{m_{22}}-1)/2}{2^{m_{22}}}$\;
+
+$a=bilinearRipmap(u_1,v_1,R[m_{11}+1][m_{21}+1])$\tcc*{Algorithm \ref{intertri2}}
+$b=bilinearRipmap(u_2,v_1,R[m_{12}+1][m_{21}+1])$\;
+$c=bilinearRipmap(u_1,v_2,R[m_{11}+1][m_{22}+1])$\;
+$d=bilinearRipmap(u_2,v_2,R[m_{12}+1][m_{22}+1])$\;
+
+$x = m_{12} - \log_2(d_1)$\;
+$y = m_{22} - \log_2(d_2)$\;
+
+\KwRet{$xy * a + (1-x)y * b + x(1-y) * c + (1-x)(1-y) * d$\;}
+\end{algorithm}
+
+
+\begin{algorithm}[H]
+\caption{$bilinearRipmap((u,v),M)$, computes the bilinear interpolation in the level $(d_1,d_2)$ as described in section \ref{Ripmap}}
+\label{intertri2}
+\KwData{Two coordinates $(u,v) \in \mb{R}^2$, an image $img[1..k][1..k]$}
+$u'=floor(u)$\;
+$v' = floor(v)$\;
+$x=u-u'$\;
+$y = v-v'$\;
+\KwRet{$(1-x)(1-y)*img[u'][v'] + (1-x)y*img[u'][v'+1] + x(1-y)*I[u'+1][v']+xy*img[u'+1][v'+1]$}\;
+\end{algorithm}
+
+
+
+\sse{Building the Ripmap}
+\medbreak
+\medbreak
+\begin{algorithm}[H]
+\caption{$buildRipMap(img)$, a naive algorithm to build the Ripmap.}
+\label{buildRipmap1}
+\KwData{An image $img[1..n][1..n]$, where $n = 2^l$}
+$R[1][1] = img$\;
+\For{$j\in\llb 2,l\rrb$}{
+	\For{$(u,v)\in \llb 1,n\rrb \times \llb1,\frac{n}{2^{j-1}}\rrb$}{
+		$R[1][j][u][v] = \frac{R[1][j-1][u][2v] + R[1][j-1][u][2v-1]}{2}$\;
+	}
+}
+
+\For{$j\in\llb 1,l\rrb$}{
+\For{$i\in\llb 2,l\rrb$}{
+\For{$(u,v)\in \llb 1,\frac{n}{2^{i-1}}\rrb \times \llb1,\frac{n}{2^{j-1}}\rrb$}{
+		$R[i-1][j][u][v] = \frac{R[i-1][j][2u][v] + R[i-1][j][2u-1][v]}{2}$\;
+	}}}
+\KwRet{$R$}
+\end{algorithm}
+\medbreak
+\medbreak
+\medbreak
+\medbreak
+\begin{algorithm}[H]
+\caption{$buildRipMapGaussian(img)$, the image is filtered in the compression direction before each down-sampling}
+\label{buildRipmap2}
+\KwData{An image $img[1..n][1..n]$, with $n = 2^l$}
+$R[1][1] = img$\;
+\For{$j\in\llb 2,l\rrb$}{
+	\For{$(u,v)\in \llb 1,n\rrb \times \llb1,\frac{n}{2^{j-1}}\rrb$}{
+		$R[1][j][u][v] = horizontaleConvolve(R[1][j-1])[u][2v]$\;
+	}
+}
+
+\For{$j\in\llb 1,l\rrb$}{
+\For{$i\in\llb 2,l\rrb$}{
+\For{$(u,v)\in \llb 1,\frac{n}{2^{i-1}}\rrb \times \llb1,\frac{n}{2^{j-1}}\rrb$}{
+		$R[i-1][j][u][v] = verticaleConvolve(R[i-1][j])[2u][v]$\;
+	}}}
+\KwRet{$R$}
+\end{algorithm}
+\medbreak
+\medbreak
+
+\noindent Here the functions $horizontaleConvolve$ and $verticaleConvolve$ convolve by a Gaussian of standard deviation $1.4$ \cite{morel2011sift} (a Gaussian blur of standard deviation 0.8 is aimed at for the output image. We assume a Gaussian blur with standard deviation 0.7 for the input image.).
+
+%Ici les fonctions $convolution$ convolent dans la direction indiquée par une gaussienne d'écart-type $1,4$ \cite{morel2011sift} (on vise un flou de $0,8$, en supposant celui de l'image de départ de $0,7$).
+
+\sse{Computational complexity} 
+
+To compute the value of a pixel of the output image, the computation of the $d_i$ and $c_i$ is constant in time, and there are four calls of $bilinearMipmap$, wich run in constant time. So the computation of a homography is linear in the size of the output image.
+
+During the pre-computation, the computation of the inverse of $H$ and of the coefficients of the partial derivatives are constant in time. The computation of a level of the Ripmap from the previous one is linear if the filter is assumed to have a compact support, which a reasonable approximation since the standard derivation of the Gaussian is constant. Moreover each level is twice smaller than the last one, so the complexity is a geometric sum and is finally linear in the size of the input image.
+
+In short, the algorithm for computing $k$ homographies is in $O(k n_1 + n_2)$ where $n_1$ the size of the output image and $n_2$ the size of the input image.
+
+
+
+
+%On étudie la complexité du Ripmap.
+
+%Pour l'évaluation d'un pixel de l'image d'arrivée, on effectue un nombre constant de calcul pour les $d_i$ et $c_i$ ou juste de $d$, puis on fait au plus 4 appels à $bilinearMipmap$, qui est elle même en temps constant. Ainsi le calcul d'une homographie est en temps linéaire en l'image d'arrivée.
+
+%Pour le précalcul, l'inversion de $H$ et le calcul des coefficients des dérivées partielles sont clairement négligeables. La construction d'un étage du Mipmap / Ripmap à partir du précédent se fait en temps linéaire, en prenant une approximation de filtre gaussien avec un nombre fini fixe de coefficients non-nuls. Cette approximation est raisonnable car l'écart-type est constant. De plus chaque étage est deux fois plus petit que le précédent, ainsi on a une somme géométrique et finalement un temps linéaire en l'image d'entrée.
+
+%L'algorithme est donc en $O(k n_1 + n_2)$ où $k$ est le nombre d'homographie, $n_1$ la taille de l'image d'arrivée et $n_2$ celle de l'image de départ.
+
+
+

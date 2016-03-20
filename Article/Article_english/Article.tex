@@ -1,0 +1,195 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{amsmath, amsfonts, amssymb}
+\usepackage{stmaryrd}
+\usepackage[english,onelanguage,boxed]{algorithm2e}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{dsfont}
+\usepackage{subfigure}
+\usepackage{geometry}
+\usepackage{amsthm}
+% \usepackage{fullpage}
+
+% raccourci pour Position Du Probleme
+\newcommand{\subfigPDP}[2]{
+ \subfigure[#1]{\includegraphics[width=40mm]{#2}}
+ }
+\newcommand{\arrowPDP}{{\raisebox{15\height}{\scalebox{1}{$\longrightarrow$}}}}
+
+%les theoremes dans le style theoreme
+\theoremstyle{plain}
+\newtheorem{prop}{Proposition}
+\newtheorem{thm}{Theorem}
+\newtheorem{lem}{Lemma}
+\newtheorem{corollaire}{Corollary}
+%les theoremes dans le style definition
+\theoremstyle{definition}
+\newtheorem{Def}{Definition}
+\newtheorem{pte}{Property}
+%les theoremes dans le style definition
+\newtheorem*{remarque}{Remark}
+\newtheorem*{remarques}{Remarks}
+
+\newcommand{\affinite}[1]{\left(\begin{array}{c c|c} #1 \end{array}\right)}
+\newcommand{\pmatrice}[1]{\begin{pmatrix} #1 \end{pmatrix}}
+
+\newcommand{\pgcd}{\wedge}
+\newcommand{\ppcm}{\vee}
+
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\blue}[1]{\textcolor{blue}{#1}}
+\newcommand{\green}[1]{\textcolor{green}{#1}}
+
+\newcommand{\Chi}{\raisebox{.40ex}{\ensuremath{\chi}}}
+
+\newcommand{\bloc}[2]{\ \\ \underline{#1 :}\\ #2 \ \\}
+\DeclareMathOperator{\sgn}{sign}
+
+%partieHugoraccourci
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{stmaryrd}
+\usepackage{nccmath}
+\usepackage[english]{babel}
+\selectlanguage{english} 
+\newcommand{\A}[0]{{\cal A}}
+\newcommand{\C}[0]{{\cal C}}
+\newcommand{\se}[1]{\medbreak \medbreak \section{#1}}
+\newcommand{\sse}[1]{\medbreak \subsection{#1}}
+\newcommand{\ssse}[1]{\subsubsection{#1}}
+\newcommand{\sssse}[1]{\paragraph*{#1}}
+%\newcommand{\Def}[0]{\ssse{Définition}}
+\newcommand{\The}[0]{\ssse{Théorème}}
+\newcommand{\Pro}[0]{\ssse{Propriété}}
+\newcommand{\Exo}[1]{\sse{Exercice #1}}
+\newcommand{\Que}[1]{\ssse{Question #1}}
+\newcommand{\llb}[0]{\llbracket}
+\newcommand{\rrb}[0]{\rrbracket}
+\newcommand{\dd}[0]{\txt{d}}
+\newcommand{\ssi}[0]{\Leftrightarrow}
+\newcommand{\ra}[0]{\rightarrow}
+\newcommand{\Ra}[0]{\Rightarrow}
+\newcommand{\la}[0]{\leftarrow}
+\newcommand{\La}[0]{\Leftarrow}
+\newcommand{\txt}[1]{\textrm{#1}}
+\newcommand{\ol}[1]{\overline{#1}}
+\newcommand{\ul}[1]{\underline{#1}}
+\newcommand{\mb}[1]{\mathbb{#1}}
+\newcommand{\abs}[1]{|#1|}
+\newcommand{\iso}[0]{\simeq}
+\newcommand{\dr}[0]{\partial}
+\newcommand{\floor}[1]{\lfloor #1\rfloor}
+ \newcommand{\BlockIf}[1]{\KwSty{Start If} \\ #1 \\ \KwSty{End If}}
+ \newcommand{\BlockElseIf}[1]{\KwSty{Start Else If} \\ #1 \\ \KwSty{End Else If}}
+ \newcommand{\BlockElse}[1]{\KwSty{Start Else} \\ #1 \\ \KwSty{End Else}}
+%finpartie
+
+\newcommand{\Gcal}{\mathcal{G}}
+
+\newenvironment{algorithme}{\begin{algorithm}[H]}{\end{algorithm}}
+
+
+\newcommand{\xbf}{\mathbf{x}}
+\newcommand{\ybf}{\mathbf{y}}
+\newcommand{\zbf}{\mathbf{z}}
+\newcommand{\ubf}{\mathbf{u}}
+\newcommand{\vbf}{\mathbf{v}}
+\newcommand{\wbf}{\mathbf{w}}
+\newcommand{\cbf}{\mathbf{c}}
+
+
+\DeclareMathOperator{\supp}{supp}
+\DeclareMathOperator{\sinc}{sinc}
+\DeclareMathOperator{\Sp}{Sp}
+\DeclareMathOperator{\Tr}{Tr}
+
+
+
+% \setcounter{secnumdepth}{5} % ajouter des \paragraph et \subparagraph
+% \setcounter{tocdepth}{5} % pour que les \paragraph et \subparagraph apparaissent au sommaire
+
+
+
+\begin{document}
+   	\begin{titlepage}
+	\begin{center}
+	\vspace*{\fill}
+
+		\vspace{0.3cm}
+		{\huge A high quality method to resample an image by a homography}\\
+		\vspace{1.5cm}
+	\today
+	\vspace{1.5cm}
+
+
+		\large
+			\emph{Authors:}\\
+			Simon Barazer,\\
+			Jean-Thomas De La Roche Saint-André,\\
+			Hugo Moeneclaey, \\
+			Shmuel Rakotonirina--Ricquebourg
+		
+\medbreak
+\medbreak
+\medbreak
+\medbreak
+\medbreak
+\medbreak
+		
+
+	\end{center}
+   	\section*{Abstract}
+   		\input{Abstract}
+	\end{titlepage}
+	\tableofcontents
+		\section*{Acknowledgement}
+		\input{Remerciements} %Jean-Thomas
+	\section*{Introduction}%Jean-Thomas
+	\addcontentsline{toc}{section}{Introduction}
+		\input{Introduction}
+	\section{Sampling affine maps}
+		\label{Exposition_du_probleme}
+		\label{szeliski_section}
+		\input{Szeliski}%shmuel
+	\section{Irregular sampling for a homography}
+		\label{decomp_geo_hom}
+		\subsection{Geometric decomposition}
+			\label{DecompositionGeometrique}
+			\input{DecompositionGeometrique}%simon
+		\subsection{Numerical implementation of unidirectional homographies}
+			\label{HomoboxRipmap}
+			\input{HomoboxRipmap}%simon
+		%\subsection{A method for rotations} %placé dans la partie experiments
+			\label{YaroSzeli}
+			%\input{YaroSzeli} %Jean-Thomas a fait une partie sur Yaroslavsky...
+	\clearpage
+	\section*{Conclusion}
+	\addcontentsline{toc}{section}{Conclusion}
+			\input{Conclusion.tex}
+	\clearpage
+	\section{Experiments}
+		\label{experiences}
+		\input{Experiments_Szeliski_Ectoplasma}
+		\clearpage
+		\input{Experiments_YaroSzeli}
+		\clearpage
+		\input{Experiments_Ripmap_decomp}
+		\clearpage
+		\input{Experiments_convergence}
+		\clearpage
+	\appendix
+	\section{The Proof of theorem \ref{thepropdecomp}}
+	        \input{Proof_theorem}
+	\label{pseudo_code}
+	\section{Algorithm for the geometric decomposition}
+		\input{Pseudo-code_decompo}
+		\input{Pseudo-code_homo_box}%hugo
+		\input{Pseudo-code_Szeliski}%shmuel
+	\nocite{*}
+	\bibliographystyle{plain}
+	\bibliography{biblio}
+\end{document}

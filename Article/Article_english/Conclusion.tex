@@ -1,0 +1,22 @@
+%ici une conclusion chouette
+
+%La décomposition géométrique permet ainsi une réalisation des homographies de meilleure qualité, et un contrôle plus rigoureux de l'\emph{aliasing} et du flou introduits. Les solutions proposées ici pour implémenter les différentes étapes ne sont que des exemples. Elles sont coûteuses en calcul bien que linéaires. Cependant, chaque étape n'agit que sur les lignes ou que sur les colonnes, ce qui permet une parallélisation efficace.
+
+%On peut ainsi imaginer des approximations moins satisfaisantes mais beaucoup plus rapides, par exemple en utilisant une méthode triple intégrale pour les rotations. De même le traitement de l'homographie unidirectionnelle peut-être simplifié, par exemple en n'intégrant que sur les entiers et en réalisant une interpolation bilinéaire.
+
+%A l'inverse si le temps de calcul n'est pas critique on peut utiliser des splines d'ordre élevé pour les rotations, ou même lors du traitement de l'homographie unidirectionnelle.
+
+%On a ainsi proposé une décomposition géométrique des homographies autour de laquelle de nombreux algorithmes peuvent s'articuler.
+
+
+
+
+
+
+The geometric decomposition allows a resampling by homography of higher quality and a stricter control of introduced aliasing and blurring. The solutions presented here to implement each step are computationally intensive but they are linear (with respect to the number of pixels) and since they act independently on rows or on columns, they can by efficiently parallelized.
+
+There can still be less rigorous but faster approximations, for example by adapting the 4-integral image for the multi-pass resampling of rotations. The resampling of the unidirectional homography can also be simplified, for example by integrating only on integers and using bilinear interpolation between them.
+
+On the contrary, if computational time is not important, splines of high order can be used to resample the unidirectional homography.
+
+To conclude, we have proposed a geometric decomposition of homographies on which a lot of algorithms can be based.

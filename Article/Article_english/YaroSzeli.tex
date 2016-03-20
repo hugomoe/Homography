@@ -1,0 +1,15 @@
+% contient la description des différentes méthodes pour traiter les rotations de la décomposition
+
+There are numerous methods to process the two rotations of the geometric decomposition. In addition to the multi-pass resampling method for affinity \cite{szeliski2010high}, the method in Fourier due to Yaroslavky \cite{unser1995convolution} is well-known for its efficiency. This section briefly compares the two. The multi-pass method has also numerous alternatives since it is a decomposition which allow several interpolation methods. Here convolutions with a raised cosine-weighted sinc and interpolations with splines are compared.
+
+
+
+
+%Pour les deux rotations dans la décomposition, plusieurs méthodes sont possibles : en plus de la méthode de traitement des affinités multi-étapes \cite{szeliski2010high}, la méthode de Yaroslavsky \cite{unser1995convolution} est connue pour son efficacité à traiter les rotations. On cherchera donc à les comparer. La méthode multi-étapes n'étant qu'une décomposition d'une affinité en quatre opérations, la comparaison se fera aussi entre plusieurs implémentations de cette méthode, en faisant varier la manière d'interpoler (convolution par un \emph{raised cosine-weighted sinc}, interpolation par des splines).
+
+Theoretically it is not correct to use splines here since the decompositon has been conceived for filtering with $h(\frac{\dot{}}{s})$ which has a variable support. However with rotations $u_{max}=v_{max}=1$, so the parameter $s$ does not impact the two first call to $\mathcal R$. If the rotation has a small angle, $r_v$ and $r_h$ are close to 1, so $s$ has very little impact, and the generally variable support is constant. In this case there is no theoretical problem.
+
+The results are shown figure \ref{troiscentrotations} and \ref{rotalena}. The multi-pass method is used in the algorithms.
+
+
+%Il est théoriquement incorrect d'utiliser des splines pour cette interpolation (on rappelle qu'on convole avec $h(\frac{\dot{}}{s})$ pour filtrer les fréquences voulues ; le support du filtre est adaptatif). Cependant, dans le cas des rotations, $u_{max}$ et $v_{max}$ valent 1, donc le paramètre $s$ n'a pas d'influence sur les deux premiers $\mathcal R$. Si de plus la rotation est d'angle faible, $r_v$ et $r_h$ sont proches de 1, donc $s$ a très peu d'influence. Donc dans ce dernier cas, convoler avec un filtre à support adaptatif (qui sera finalement un support fixé) ou interpoler par des b-splines ne change rien au niveau théorique.

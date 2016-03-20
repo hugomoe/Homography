@@ -1,0 +1,94 @@
+\subsection{Algorithm for the geometric decomposition}
+ 
+ In the algorithms the following convention is used : $H = \pmatrice{a&b&p\\c&d&q\\r&s&t}$ is the $3\times 3$ matrix characterizing the homography, so that $img$ is the input image and $img_f$ the output image, $img_f(x) = img(H(x))$. The decomposition $H \sim T_{c} R_{\psi}  \tilde H R_{\phi}$ (obtained in formula \ref{formule_decomposition_effective}) is processed from left to right. We denote by $A \tilde H B$ the decomposition that will be returned by the algorithm $decomposition$. 
+ 
+ %On rappelle que dans les algorithmes qui suivent, on prend la convention suivante : $H = \pmatrice{a&b&p\\c&d&q\\r&s&t}$ est la matrice carrée de taille 3 (ou l'application homographique) telle que si $img$ est l'image d'entrée et $img_f$ est l'image de sortie, $img_f(x) = img(H(x))$. Ainsi, la décomposition $H \sim T_{c} R_{\psi}  \tilde H R_{\phi}$ est exécutée de gauche à droite. On notera cette décomposition $A \tilde H B$, et ces trois matrices seront les objets renvoyés par $decomposition$.
+ 
+ The $decomposition$ algorithm (algorithm \ref{pseudoCodeDecompo}) implements the decomposition described in figure \ref{SchemaEtapesDecompoGeometrique}. The degree of freedom left in the decomposition of the theorem \ref{thepropdecomp} is set in order to cancel the translation $T_{(x_2,y_2)}$ on  the left of the decomposition. To achieve this we remind that $(x_2,y_2)$ verify
+ \begin{equation}
+ \Delta_H(x_2 , y_2 ) \stackrel{\text{def}}{=} \hat r ((rc+sd)-(r^2 + s^2)y_2) - \hat s ((ar+sb)-(r^2 + s^2 )x_2) = 0,
+ \label{equationAlgo6}
+ \end{equation}
+ so it is possible to choose $x_2 = -\frac{\Delta_H(0,0)}{(r^2+s^2)\hat s}, y_2 = 0$ or $x_2 = 0, y_2 = -\frac{\Delta_H(0,0)}{(r^2+s^2)\hat r}$, depending on whether $\hat r$ or $\hat s$ is different from zero (if $\hat r=0$ and $\hat s=0$ then $H$ is an affine mapping). 
+ 
+ %Cet algorithme $decomposition$ (algorithme \ref{pseudoCodeDecompo}) présente la décomposition correspondant aux schémas \ref{SchemaEtapesDecompoGeometrique}. Arbitrairement, on choisit le degré de liberté de sorte à annuler une des translations (verticale ou horizontale) de $T_c$ : pour cela, on rappelle que $(x_2,y_2)$ (nommés $x_2,y_2$ dans l'algorithme) doivent vérifier
+% \[\Delta_H(x_2 , y_2 ) \stackrel{\text{déf}}{=} \hat r ((rc+sd)-(r^2 + s^2)y_2) - \hat s ((ar+sb)-(r^2 + s^2 )x_2) = 0 \]
+% On prend donc $x_2 = x_2 = -\frac{\Delta_H(0,0)}{(r^2+s^2)\hat s}, y_2 = y_2 = 0$ ou $x_2 = x_2 = 0, y_2 = y_2 = -\frac{\Delta_H(0,0)}{(r^2+s^2)\hat r}$, en choisissant de sorte à ne pas diviser par zéro.
+ 
+   \begin{algorithme}
+     \label{pseudoCodeDecompo}
+     \caption{$decomposition(H)$}
+     \KwData{A homography matrix which is not affine $H = \pmatrice{a&b&p\\c&d&q\\r&s&t} \in \mathcal M_{3,3}$, its inverse $H^{-1}=\pmatrice{\hat a&\hat b&\hat p\\ \hat c&\hat d&\hat q\\ \hat r&\hat s&\hat t} $.}
+     \eIf{$as-br\neq0$}{
+      $x_2 = -\frac{\Delta_H(0,0)}{(r^2+s^2)\hat s}$\tcc*{see \eqref{equationAlgo6}}
+      $y_2 = 0$\;
+     }{
+      $x_2 = 0$\;
+      $y_2 = -\frac{\Delta_H(0,0)}{(r^2+s^2)\hat r}$\tcc*{see \eqref{equationAlgo6}}
+     }
+     $N_\phi = \sqrt{r^2+s^2}$\;
+     $R_\phi = \pmatrice{
+      \frac{r}{N_\phi} & \frac{s}{N_\phi} & 0\\
+      -\frac{s}{N_\phi} & \frac{r}{N_\phi} & 0\\
+      0 & 0 & 1}$\;
+     $N_\psi = \sqrt{((a+x_2r)s-(b+x_2s)r)^2+((c+y_2r)s-(d+y_2s)r)^2}$\;
+     $R_\psi = \pmatrice{
+      \frac{(c+y_2r)s-(d+y_2s)r}{N_\psi} & \frac{(a+x_2r)s-(b+x_2s)r}{N_\psi} & 0\\
+      -\frac{(a+x_2r)s-(b+x_2s)r}{N_\psi} & \frac{(c+y_2r)s-(d+y_2s)r}{N_\psi} & 0\\
+      0 & 0 & 1}$\;
+     $A = \pmatrice{1&0&-x_2\\0&1&-y_2\\0&0&1}R_\psi$\;
+     $\tilde H = \pmatrice{
+      -\frac{((a+x_2r)(d+y_2s)-(b+x_2s)(c+y_2r))N_\phi}{N_\psi} & 0 & \frac{p((c+y_2r)s-(d+y_2s)r)-q((a+x_2r)s-(b+x_2s)r)}{N_\psi}\\
+      0 & -\frac{N_\psi}{N_\phi} & \frac{p((a+x_2r)s-(b+x_2s)r)+q((c+y_2r)s-(d+y_2s)r)}{N_\psi}\\
+      N_\phi & 0 & t}$\;
+     $B = R_\phi$\;
+     \KwRet{$A,\tilde H,B$}
+   \end{algorithme}
+   
+   In a practical implementation, the computation of $H^{-1}$ is not necessary to obtain $x_2$ and $y_2$ since we have
+   \[\frac{\Delta_H(0,0)}{(r^2+s^2)\hat s} = \frac{(as-br)(ar+bs)+(cs-dr)(cr+ds)}{(r^2+s^2)(as-br)},\]
+ \[\frac{\Delta_H(0,0)}{(r^2+s^2)\hat r} = \frac{(as-br)(ar+bs)+(cs-dr)(cr+ds)}{(r^2+s^2)(cs-dr)}.\]
+ ($\Delta_H$ is defined in \eqref{equationAlgo6}).
+%Moreover the condition $as-br=0$ is never true so it is replaced by a condition $as-br<cs-dr$.
+   
+ %  Dans une implémentation pratique, on n'inverse pas la matrice $H$ pour obtenir les valeurs de $x_2$ et $y_2$, car les quantités susmentionnées se simplifient en
+ %\[\frac{\Delta_H(0,0)}{(r^2+s^2)\hat s} = \frac{(as-br)(ar+bs)+(cs-dr)(cr+ds)}{(r^2+s^2)(as-br)}\]
+ %\[\frac{\Delta_H(0,0)}{(r^2+s^2)\hat r} = \frac{(as-br)(ar+bs)+(cs-dr)(cr+ds)}{(r^2+s^2)(cs-dr)}\]
+% De plus, en pratique, la condition $as-br=0$ n'est jamais vérifiée, on préfère donc la remplacer par une condition $as-br<cs-dr$.
+
+\subsection{The global algorithm}
+ \label{translainsta}
+ 
+ Using the decomposition and the algorithms for homographies and affinities presented in next sections, all homographies can be processed. For affinities we apply the multi-pass resampling. For the other homographies, we proceed as follows.
+  
+% À partir de la décomposition, en utilisant les algorithmes de traitement d'homographie et d'affinités des sections suivantes, on peut donc traiter une homographie quelconque :
+ 
+ Auxiliary images are created for each step (between rotation and homography, and between homography and rotation). These auxiiliary images are large enough to contain the whole image. Each image (input, auxiliary or output) is in some rectangle of the plan $rect$, which is characterized by
+ \begin{itemize}
+  \item its size (its width and its height are noted $w$ and $h$ in all algorithms)
+  \item its position in the plane, given by the coordinates of the origin of the rectangle (i.e. the coordinates of its top-left pixel in the plane). Those coordinates are noted $(\mu,\nu)$. By convention, the coordinates $(\mu,\nu)$ are $(0,0)$ for the input and the output images
+ \end{itemize}
+ It is possible to compute the smallest rectangle of the plane containing the information thus minimizing the size of the auxiliary images and processing translation only by adjusting $(\mu,\nu)$.
+ 
+ \begin{prop}
+ The size of auxiliary images is bounded independently of the homography.
+ \end{prop}
+ 
+ 
+ %On crée des images intermédiaires pour entre chaque étape (entre affinité et homographie et entre homographie et affinité) d'une taille suffisamment grande pour contenir toute l'image entre les transformations. Chaque image (d'entrée, intermédiaire ou de sortie) se situe dans un rectangle du plan, $rect$, qui peut être caractérisé par ses tailles (largeur, hauteur) et sa position dans le plan, par exemple par les coordonnées $(\mu,\nu)$ de son origine (son pixel supérieur gauche). On peut donc caractériser la portion du plan qui contient l'information d'une image intermédiaire, et donc minimiser la taille de celles-ci ou encore traiter les translations uniquement en changeant les paramètres $\mu$ et $\nu$.
+ 
+  \begin{proof}
+  The first auxiliary image is smaller than the smallest rectangle containing the result of the first affinity. This affine transform being $A^{-1}$, the size and position of this first image is given by $rect_{\text{inter},1} \supset A^{-1}(rect_\text{input})$, where $rect_\text{input}$ is the rectangle containing the input image (this is a rectangle which size is the one of the input image and with origin $(\mu,\nu)=(0,0)$ ). Since the translation is processed by changing $(\mu,\nu)$, the size of the auxiliary image only depends on the linear part of $A^{-1}$, i.e. a rotation. So its size is bounded by $\sqrt{2}$ times the largest dimension of the input image plus one, to take into account that this size must be an integer.
+  
+  The second auxiliary image should \emph{a priori} be the smallest rectangle containing $\tilde H^{-1}(rect_{\text{inter},1})$. This is not bounded when $H$ (so $\tilde H$) vary. However the parts which will not appear on the final image after the last rotation can be forgotten. Let $rect_{\text{inter},2} \supset B(rect_{\text{output}})$ be the smallest rectangle containing the inverse image of the output window by the second affinity. In this case, as before, the second auxiliary image is bounded by $\sqrt{2}$ times the largest dimension of the output image.
+   \end{proof}
+ 
+\noindent{\bf Complexity:} We show in section \ref{decompCompexity} that, assuming a bounded width/height ratio, the application of the functions processing homographies and rotations has complexity $O(n_1+n_2)$ where $n_1$ is the size of the auxiliary input image and $n_2$ the size of the auxiliary output image. Let $N_1$ be the size of the input image and $N_2$ the size of the output image. Since the auxiliary images are in $O(N_1+N_2)$, the whole algorithm is in $O(N_1+N_2)$.
+ 
+ %\begin{proof}
+ %La première image intermédiaire sera le plus petit rectangle du plan contenant le résultat de la première affinité. L'affinité appliquée étant $A^{-1}$, la taille et la position de la première image intermédiaire dans le plan sont données par $rect_{\text{inter},1} \supset A^{-1}(rect_\text{entrée})$, où $rect_\text{entrée}$ est le rectangle du plan où est stockée l'image d'entrée (sa taille est celle de l'image d'entrée, son origine a pour coordonnées $(\mu,\nu)=(0,0)$). Les translations étant prises en compte en choisissant la position $(\mu,\nu)$ de l'image intermédiaire, sa taille ne dépend plus que de la partie linéaire de $A^{-1}$, i.e. une rotation. Sa taille est donc bornée par $\sqrt{2}$ fois la plus grande dimension de l'image d'entrée (plus ou moins 1 pixel, pour avoir des tailles entières).
+ 
+ %La seconde image intermédiaire devrait, a priori, être le plus petit rectangle du plan contenant $\tilde H^{-1}(rect_{\text{inter},1})$. Cependant, la taille d'un tel rectangle n'est pas bornée quand $\tilde H$ (et donc $H$) varie. Cependant, puisqu'il ne reste plus qu'une affinité après cette image intermédiaire, on peut s'autoriser à perdre les parties de l'image (et du plan) qui n'apparaitront pas dans la fenêtre de sortie. On peut donc définir $rect_{\text{inter},2} \supset B(rect_{\text{sortie}})$ le plus petit rectangle contenant l'antécédent de la fenêtre de sortie par la dernière affinité ($rect_{\text{sortie}}$ est le rectangle du plan où sera stockée l'image finale (sa taille est celle de la fenêtre de sortie, son origine a pour coordonnées $(\mu,\nu)=(0,0)$)). Dans ce cas, pour la même raison que plus haut, la taille de la seconde image intermédiaire est bornée par $\sqrt{2}$ fois la plus grande dimension de l'image de sortie (plus ou moins 1 pixel).
+ %\end{proof}
+ 
+%On verra plus tard que, en supposant le rapport hauteur sur largeur borné, l'appel des fonctions qui effectuent les affinités et l'homographie sont en $O(n_1+n_2)$ où $n_1$ est la taille de l'image intermédiaire d'entrée et $n_2$ celle de l'image intermédiaire de sortie. Ainsi comme les tailles des images intermédiaires sont en $O(N_1+N_2)$ où $N_1$ est l'image d'entrée et $N_2$ celle de sortie, on peut conclure que le calcul total est en $O(N_1+N_2)$.

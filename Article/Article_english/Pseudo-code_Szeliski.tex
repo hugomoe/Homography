@@ -1,0 +1,251 @@
+\subsection{Algorithm of the multi-pass resampling method for affine transforms}
+%\subsection{Pseudo-code pour la méthode multi-étapes de traitement des affinités}
+
+
+ In the algorithm, the notations
+ %On définit des notations utilisées dans les pseudo-codes suivants :
+ \begin{itemize}
+ \item $x \ppcm y = \max(x,y)$, $x \pgcd y = \min(x,y)$
+ \item $x^+ = 0 \ppcm x$, $x^- = 0 \ppcm (-x)$ for the positive and negative parts of $x$
+ \end{itemize}
+ are used.
+ 	The following algorithms explain how the multi-pass resampling method for affine transforms works. The method in the article by Szeliski, Winder et Uyttendaele \cite{szeliski2010high} only do the affine transform from an image of a given size to an other one of the same size. In the algorithm below, a special attention during the first step to not throw away a part of the image when increasing the size of the array representing the image has been paid. Therefore the size of the input and output arrays - which represents the intial and final images- must be controllable.
+ 
+ 
+ 
+ %Les algorithmes qui suivent correspondent à l'implémentation de la méthode multi-étapes de traitement des affinités. La méthode proposée dans l'article de Szeliski, Winder et Uyttendaele \cite{szeliski2010high} effectue uniquement l'affinité, d'une image de taille donnée dans une autre de même taille. Ici, on évite que la première étape de la décomposition ne rogne une partie de l'image en agrandissant le tableau sur lequel on travaille. On veut donc pouvoir préciser la taille des tableaux d'entrée et de sortie qui stockeront les images.
+  
+
+\subsubsection{The algorithm in itself}
+% \subsubsection{Corps de l'algorithme}
+ The first algorithm do an affine transform using the lower algorithms. The variables $x_i,y_i$ and $x_f,y_f$ represents the coordinates different points. Those points are the centers of some rectangles : the one containing the inital image and the one on which will be the final image. Thus, translation can be made by changing  $x_i,y_i$ befor doing the transformation $\mathcal R$. It avoids to take into acount a translation in $\mathcal R$, and so to need for values that are not in the array.
+ 
+ In order to upsample (of a factor at most three in each direction), the input image has to be put into an image three times bigger. In order to create symmetrical boundaries conditions, the remaining of the "three times bigger image"  must be filled by symmetry. Then one must consider to put some black pixels, at the end of the homography, where there be black pixels ( so as not to have the mirrored parts on the output image).
+
+ % Cet algorithme applique une affinité en appelant chacun des algorithmes qui suivent. On introduit des variables $x_i,y_i$ et $x_f,y_f$ qui représentent des coordonnées de points. Ces point est les centres de rectangles du plan, respectivement le rectangle contenant l'image initiale et le rectangle sur lequel créer l'image finale. Ainsi, on peut prendre en compte une translation en changeant $x_i,y_i$ avant d'effectuer l'opération $\mathcal R$. Cela évite de prendre en compte une translation dans $\mathcal R$, et donc de faire sortir l'image du tableau.
+  
+ % Pour pouvoir sur-échantillonner (d'un facteur au plus 3 dans chaque direction), on doit plonger l'image d'entrée dans une image de dimensions 3 fois plus grandes. Pour créer des conditions au bords symétriques, il faut remplir par symétrie le reste de l'image plus grande. Il faut alors penser à mettre du noir, à la fin du traitement de l'homographie, là où il devait y en avoir (pour ne pas avoir des répliques symétrisées de l'image initiale autour de l'image de sortie).
+  
+   \begin{algorithme}
+    \KwData{An input image $img[1..m][1..n]$, the size for the output image $[1..m'][1..n']$, an affine transform array $A = \pmatrice{a_{00} & a_{01} & t_0\\ a_{10} & a_{11} & t_1}$}
+    $transpoOpt(img,A)$\;\ \\
+    $u_{max}, v_{max} = MaxFrequencies(A)$\;
+	$b_0 = a_{00}-\frac{a_{01}a_{10}}{a_{11}}$\;
+	$b_1 = \frac{a_{01}}{a_{11}}$\;
+	$r_v = \min(3,\max (1,|a_{01}|u_{max}+\min (1,|a_{11}|v_{max})$\;
+	$r_h = \min(3,\max (1,|a_{10}/a_{11}|r_vv_{max}+\min (1,|b_0|u_{max})))$\;
+	\ \\
+	$dm,dn = \frac{m'-m}{2},\frac{n'-n}{2}$\;
+	$img_0 = $ an empty image which size is $3(m \ppcm m') \times 3(n \ppcm n')$\;
+	Copy $img$ at the center of $img_0$ and fill the remaining parts of $img_0$ by symmetry)\;
+	\ \\
+	$x_i = \frac{m}{2}, y_i = \frac{n}{2}$\;
+	$x_f = x_i, y_f = \frac{r_v}{a_{11}}y_i$\;
+	$img_1 = \mathcal{R}_v(img_0,\frac{1}{v_{max}},\frac{a_{11}}{r_v},0,(x_i,y_i),(x_f,y_f))$\;
+	$x_i = x_f-t_2, y_i = y_f$;\tcc{translation on the rows}
+	$x_f = \frac{r_h}{b_0} x_i - \frac{a_{01}r_h}{r_v b_0} y_i, y_f = y_i$\;
+	$img_2 = \mathcal{R}_h(img_1,\frac{1}{u_{max}},\frac{b_0}{r_h},\frac{a_{01}}{r_v},(x_i,y_i),(x_f,y_f))$\;
+	$x_i = x_f, y_i = y_f - \frac{t_1r_v}{a_{11}}$;\tcc{translation on the columns}
+	$x_f = x_i, y_f = \frac{n \ppcm n'}{2}$\;
+	$img_3 = \mathcal{R}_v(img_2,r_v,r_v,\frac{a_{10}r_v}{a_{11}r_h},(x_i,y_i),(x_f,y_f))$\;
+	$x_i = x_f, y_i = y_f$;
+	$x_f = \frac{m \ppcm m'}{2}, y_f = \frac{n \ppcm n'}{2}$\;
+	$img_4 = \mathcal{R}_h(img_3,r_h,r_h,0,(x_i,y_i),(x_f,y_f))$\;
+	\KwRet{$img_4[m \ppcm m' .. (m \ppcm m') + m'][n \ppcm n' .. (n \ppcm n') + n']$}
+    \caption{Multi-pass resampling method for affine transforms $applyAffinity(img,A)$}
+    \label{algoPresqueAussiUniqueQueLesDeuxAutres}
+    \label{szeliski_affine}
+   \end{algorithme}
+   
+ During the computation of the whole affine transform, the image (and the affinity) can be transposed so as to avoid the bottleneck problem.
+ % Dans le traitement de l'affinité totale, on transpose éventuellement l'image (et l'affinité) pour éviter le \emph{bottleneck problem}.
+  
+   \begin{algorithme}
+    \KwData{An image $img[1..m][1..n]$, an affine transform array $A = \pmatrice{a_{00} & a_{01} & t_0\\ a_{10} & a_{11} & t_1}$}
+    \bloc{Normalization of $A$'s rows}{
+     \For{$k \in \{0,1\}$}{
+      $l_k=\sqrt{a_{k0}^2+a_{k1}^2}$\;
+      $\hat{a}_{k0}=a_{k0}/l_k$\;
+      $\hat{a}_{k1}=a_{k1}/l_k$\;
+     }
+    }
+    \bloc{Transposition}{
+     \If{$|\hat{a}_{00}|+|\hat{a}_{11}| < |\hat{a}_{01}|+|\hat{a}_{10}|$}{
+      $img_{temp} = $ an array which size is $n \times m$\;
+      \For{$(i,j) \in \llbracket 1,m \rrbracket \times \llbracket 1,n \rrbracket$}{
+       $img_{temp}[j][i]=img[i][j]$\;
+      }
+      $img=img_{temp}$\;
+      $A=\pmatrice{a_{10} & a_{11} & t_1\\ a_{00} & a_{01} & t_0}$\;
+      $\pmatrice{a_{00} & a_{01} & t_0\\ a_{10} & a_{11} & t_1}=A$\;
+      $(m,n) = (n,m)$\;
+     }
+    }
+    \caption{The potential transposition $transpoOpt(img,A)$ (discribed in section\ref{szeliski_transpoOpt_section})}
+    \label{szeliski_transpoOpt}
+   \end{algorithme}
+
+ \subsubsection{Maximal frequencies $u_{max}, v_{max}$}
+
+In $MaxFrequencies$, $u_{max}$ et $v_{max}$ - which are the maximal frequencies kept in the spectrum - are determined. This algorithm uses both $verticalIntersections$ and $horizontalIntersections$, which compute the intersections of a segment (whose bounds' coordinates are $(U_1,V_1)$ and $(U_2,V_2)$) and two parallel sides of the $[-1,1]^2$ square (either the two vertical ones, or the two horizontal ones). The knowledge of those intersections and the symmetry with respect to the $(0,0)$ point of the linear mapping are sufficient to know all the vertices of the polygon $[-1,1]^2 \cap \ ^t\!\!A^{-1}[-1,1]^2$, and thus all points of maximal coordinates.
+ 
+ % Dans $frequencesMax$, on détermine $u_{max}$ et $v_{max}$ les fréquences conservées maximales, au-delà desquelles appliquer l'affinité coupera le spectre. Ce pseudo-code s'appuie sur deux autres, $verticalIntersections$ et $horizontalIntersections$, qui intersectent un segment (dont les extrémités ont pour coordonnées $(U_1,V_1)$ et $(U_2,V_2)$) avec deux côtés parallèles du carré $[-1,1]^2$ (soit les deux côtés verticaux, soit les deux horizontaux). La connaissance de ces intersections et la symétrie par rapport au point $(0,0)$ de l'application linéaire suffisent à connaître la totalité des sommets du polygone $[-1,1]^2 \cap \ ^t\!\!A^{-1}[-1,1]^2$, et donc les points de coordonnées maximales.
+  
+  NB : $^t\!\!A^{-1}[-1,1]^2$ are all the frequencies kept by the affine transforme $A$.
+
+ %NB : $^t\!\!A^{-1}[-1,1]^2$ est l'ensemble des fréquences conservées par l'effet de l'affinité $A$.
+
+  \begin{algorithme}
+   \KwData{$A$ linear mapping array $2 \times 2$}
+   $\pmatrice{u_1\\v_1} =\ ^t\!\!A^{-1}\pmatrice{1\\1}$\;
+   $\pmatrice{u_2\\v_2} =\ ^t\!\!A^{-1}\pmatrice{1\\-1}$\;
+   $M = $Empty array which size is $2 \times 0$\;
+   \If{$|u_1|\leq1$ and $|v_1|\leq1$}{
+    Concatenate $M$ and $(u_1,v_1)^T$\;
+   }
+   \If{$|u_2|\leq1$ and $|v_2|\leq1$}{
+    Concatenate $M$ and $(u_2,v_2)^T$\;
+   }
+   \uIf{$u_1=u_2$}{
+    \eIf{$v_1=-v_2$}{
+     \KwRet{$(\min(|u_1|,1),\min(|v_1|,1)$}
+    }{
+     Concatenate $M$ and $horizontalIntersections(u_1,v_1,u_2,v_2)$\;
+     Concatenate $M$ and $verticalIntersections(u_1,v_1,-u_2,-v_2)$\;
+     Concatenate $M$ and $horizontalIntersections(u_1,v_1,-u_2,-v_2)$\;
+    }
+   }
+   \uElseIf{$u_1=-u_2$}{
+    \eIf{$v_1=v_2$}{
+     \KwRet{$(\min(|u_1|,1),\min(|v_1|,1)$}
+    }{
+     Concatenate $M$ and $horizontalIntersections(u_1,v_1,-u_2,-v_2)$\;
+     Concatenate $M$ and $verticalIntersections(u_1,v_1,u_2,v_2)$\;
+     Concatenate $M$ and $horizontalIntersections(u_1,v_1,u_2,v_2)$\;
+    }
+   }
+   \Else{
+    Concatenate $M$ and $verticalIntersections(u_1,v_1,u_2,v_2)$\;
+    Concatenate $M$ and $verticalIntersections(u_1,v_1,-u_2,-v_2)$\;
+    \uIf{$v_1=v_2$}{
+     Concatenate $M$ and $horizontalIntersections(u_1,v_1,-u_2,-v_2)$\;
+    }
+    \uElseIf{$v_1=-v_2$}{
+     Concatenate $M$ and $horizontalIntersections(u_1,v_1,u_2,v_2)$\;
+    }
+    \Else{
+     Concatenate $M$ and $horizontalIntersections(u_1,v_1,u_2,v_2)$\;
+     Concatenate $M$ and $horizontalIntersections(u_1,v_1,-u_2,-v_2)$\;
+    }
+   }
+   \tcc{At that stage, $M$ the list of nearly all the vertices $(M[1][i],M[2][i])$ of the polygon one want to know all maximal frequencies}
+   \eIf{$M$ is empty}{
+    \KwRet{$(1,1)$}
+   }{
+   \KwRet{$(\max_{i}\{|M[1][i]|\},\max_{i}\{|M[2][i]|\})$}
+   }
+   \caption{$MaxFrequencies(A)$ (described in \ref{szeliski_frequencesMax_section})}
+   \label{pseudo-code_umax_vmax}
+  \end{algorithme}
+  
+  \begin{algorithme}
+   \KwData{$(U_1,V_1)$ et $(U_2,V_2)$ coordinates of the bounds of a non-vertical segment ($U_1\neq U_2$)}
+   $u_+ = 1$\;
+   $u_- = -1$\;
+   $v_+ = V_1+(u_+-U_1)\frac{V_2-V_1}{U_2-U_1}$\;
+   $v_- = V_1+(u_--U_1)\frac{V_2-V_1}{U_2-U_1}$\;
+   $l =$ array of size $2 \times 0$\;
+   \If{$|u_+|\leq1$ and $|v_+|\leq1$ and ($U_1 \leq u_+ \leq U_2$ or $U_2 \leq u_+ \leq U_1$)}{
+    Concatenate $l$ and $(u_+,v_+)^T$\;
+   }
+   \If{$|u_-|\leq1$ and $|v_-|\leq1$ and ($U_1 \leq u_- \leq U_2$ or $U_2 \leq u_- \leq U_1$)}{
+    Concatenate $l$ and $(u_-,v_-)^T$\;
+   }
+   \caption{$verticalIntersections(U_1,V_1,U_2,V_2)$ (décrit en \ref{szeliski_frequencesMax_section})}
+   \label{szeliski_intersectionsVerticales}
+  \end{algorithme}
+
+  \begin{algorithme}
+   \KwData{$(U_1,V_1)$ et $(U_2,V_2)$ coordinates of the bounds of a non-horizontal segment ($V_1 \neq V_2$)}
+   $v_+ = 1$\;
+   $v_- = -1$\;
+   $u_+ = U_1+(v_+-V_1)\frac{U_2-U_1}{V_2-V_1}$\;
+   $u_- = U_1+(v_--V_1)\frac{U_2-U_1}{V_2-V_1}$\;
+   $M =$ array of size $2 \times 0$\;
+   \If{$|u_+|\leq1$ and $|v_+|\leq1$ and ($V_1 \leq v_+ \leq V_2$ or $V_2 \leq v_+ \leq V_1$)}{
+    Concatenate $M$ and $(u_+,v_+)^T$\;
+   }
+   \If{$|u_-|\leq1$ and $|v_-|\leq1$ and ($V_1 \leq v_- \leq V_2$ or $V_2 \leq v_- \leq V_1$)}{
+    Concatenate $M$ and $(u_-,v_-)^T$\;
+   }
+   \caption{$horizontalIntersections(U_1,V_1,U_2,V_2)$ (described in section \ref{szeliski_frequencesMax_section})}
+   \label{szeliski_intersectionsHorizontales}
+  \end{algorithme}
+  
+  \subsubsection{Implementation of the transformations $\mathcal R$}
+  
+	Both ($\mathcal{R}_h$ and $\mathcal{R}_v$) algorithms work in the following way : first the values of the filter $h(\frac{\dot{}}{s})$ on $\{k+p2^{-b},(k,p)\in \llbracket -N,N \rrbracket \times \llbracket 0,2^b-1 \rrbracket\}$ are kept in memory. The parameter $s$ expands the support of the filtering mapping ; $b$ is a parameter which can change the computation precision. Then the values kept in memory are used to convolve along one direction with the filter.
+
+
+%  Les deux algorithmes ($\mathcal{R}_h$ et $\mathcal{R}_v$) fonctionnent de la manière suivante : dans un premier temps, on stocke à l'avance les valeurs prises par le filtre $h(\frac{\dot{}}{s})$ sur $\{k+p2^{-b},(k,p)\in \llbracket -N,N \rrbracket \times \llbracket 0,2^b-1 \rrbracket\}$. $s$ est donc un paramètre pour élargir éventuellement le support de la fonction filtre ; $b$ est un paramètre de précision des calculs. Dans un second  temps on utilise ces valeurs stockées pour convoler selon une direction avec ledit filtre.
+  
+
+In those algorithms, it is possible to call some values in the image $img[i][j]$ without checking if $i$ and $j$ are within the image boundaries. Otherwise, these values are fixed to zero. Even if it creates some ringing, this will only occur in the symetrized part of the image, which will not remain in the final image.
+
+  % Dans ces pseudo-codes, on s'autorise à appeler des valeurs de l'image $img[i][j]$ sans vérifier que $i$ et $j$ sont compris dans l'image. On peut dans ce cas considérer le terme comme nul : même si cela crée de l'effet Gibbs, celui-ci ne sera visible que sur la réplique symétrisée de l'image, réplique qui sera mise à noir plus tard.
+  
+   \begin{algorithme}
+    \KwData{An input image $img[1..m][1..n]$, some coefficients $s, a_0, a_1 \in \mathbb{R}$, the coordinates (in the plane) of the center of the input image $x_i,y_i$, the coordinates (in the plane) of the center of the output image $x_f,y_f$, an interpolation filter $h$, $M$ such that $\supp h \subset [-M,M]$, a computation precision in bits $b$}
+    $N = \lceil sM \rceil$\;
+    $H = $ an array of size $(2N+1) \times 2^b$\;
+    Storage in $H$ of $h$ ($H[k][p] = h(\frac{k+2^{-b}p}{s}$) values\;\ \\
+    $img_f = $ empty array of size $m \times n$\;
+    \bloc{Convolution (along $i$) with a kernel centered on $i'$ ; $\red j$ is constant(formula \ref{formule_convolution_discrete})}{
+     \For{$(i,j)\in \llbracket 1,m \rrbracket \times \llbracket 1,n \rrbracket$}{
+      $i' = \frac{m}{2}-x_i+a_0(i+x_f-\frac{m}{2})+a_1(j+y_f-\frac{n}{2})$\;
+      $k^* = \lfloor i' \rfloor$\;
+      $\phi = i'-k^*$\;
+      $p = \lfloor 2^b\phi \rfloor$\;
+      $img_f[i][\red j]=\displaystyle{\sum_{k=k^*-N}^{k^*+N}} H[k^*-k][p]*img[k][\red j]$\tcc*{see \eqref{formule_convolution_discrete}}
+     }
+    }
+    \KwRet{$img$}
+    \caption{$\mathcal{R}_h(img,s,a_0,a_1,(x_i,y_i),(x_f,y_f))$}
+    \label{algoUniqueEnSonGenre}
+    \label{szeliski_rh}
+   \end{algorithme}
+
+   \begin{algorithme}
+    \KwData{An image $img[1..m][1..n]$, some coefficients $s, a_0, a_1, t \in \mathbb{R}$, the coordinates (in the plane) of the center of the input image $x_i,y_i$, the coordinates (in the plane) of the center of the ouput image $x_f,y_f$, an interpolation filter $h$, $M$ such that $\supp h \subset [-M,M]$,  a computation precision in bits $b$}
+    $N = \lceil sM \rceil$\;
+    $H = $ an array of size $(2N+1) \times 2^b$\;
+    Storage in $H$ of $h$ values\;\ \\
+    $img_f = $ array of size $m \times n$\;
+    \bloc{Convolution (along $j$) with a kernel centered on $j'$ ; $\red i$ is constant(equation \eqref{formule_convolution_discrete}}{
+     \For{$(i,j)\in \llbracket 1,m \rrbracket \times \llbracket 1,n \rrbracket$}{
+      $j' = \frac{n}{2}-y_i+a_1(i+x_f-\frac{m}{2})+a_0(j+y_f-\frac{n}{2})$\;
+      $k^* = \lfloor j' \rfloor$\;
+      $\phi = j'-k^*$\;
+      $p = \lfloor 2^b\phi \rfloor$\;
+      $img_f[\red i][j]=\displaystyle{\sum_{k=k^*-N}^{k^*+N}} H[k^*-k][p]*img[\red i][k]$\tcc*{see \eqref{formule_convolution_discrete}}
+     }
+    }
+    \KwRet{$img_f$}
+    \caption{$\mathcal{R}_v(img,s,a_0,a_1,(x_i,y_i),(x_f,y_f))$}
+    \label{algoToutAussiUnique}
+    \label{szeliski_rv}
+   \end{algorithme}
+
+   \subsubsection{Computational complexity}
+   
+ $TranspoOpt$ has a computation cost that is linear with the size of the input image. $frequenceMax$ has a constant input size, and has no loop, its computation time is therefore constant. Assuming that the ratio height/width is bounded, the allocation and filling of $img_0$ has a computation time in $O(n_1+n_2)$ where $n_1$ is the size of the input image and $n_2$ the size of the output image.
+  % $TranspoOpt$ est clairement linéaire en l'image d'entrée. $frequenceMax$ a une entrée de taille constante, et n'a pas de boucle, elle s'évalue donc en temps constant. En supposant le rapport hauteur/largeur borné, $img_0$ se déclare en $O(n_1+n_2)$ où $n_1$ est la taille de l'image d'entrée et $n_2$ celle de l'image de sortie.
+  In ${\mathcal R}_v$ for instance, each pixel evaluation has a computation time in $O(N)$, that is to say in $O(s)$. Thus the function seems to be in $O(mns)$, but in the algorithm $s$ is either equal to $r_v$ which is bounded by $3$, or $\frac{1}{v_{max}}$. In the second case, the number of pixels to evaluate is proportional to $v_{max}$. Thus ${\mathcal R}_v$ and ${\mathcal R}_h$ have a computational cost linear in their input image for this algorithm. In our algorithms, we evaluate at every pixel (even those for which it is unneccesary) but since $u_{max} = v_{max} = 1$ for a rotation, $\frac{1}{v_{max}}$ is still bounded.
+
+ %  Pour ${\mathcal R}_v$ par exemple, chaque pixel s'évalue en $O(N)$, c'est-à-dire en $O(s)$. Ainsi la fonction est a première vue en $O(mns)$, mais dans l'algorithme $s$ vaut soit $r_v$ qui est borné par $3$, ou $\frac{1}{v_{max}}$. Dans le second cas on n'évalue qu'un nombre proportionnel à $v_{max}$ de pixels. Ainsi les ${\mathcal R}_v$ et ${\mathcal R}_h$ sont linéaire en leur image d'entrée dans cet algorithme.
+   
+    Notice that the auxiliary images $img_i$ have sizes which are in $O(n_1+n_2)$.
+  % Or on voit que les $img_i$ sont de taille $O(n_1+n_2)$.
+   \medbreak
+   Finally, the algoritm has a computational cost in $O(n_1+n_2)$ with $n_1$ the size of the input image and $n_2$ the size of the output image.
+ %  Finalement l'algorithme est donc en $O(n_1+n_2)$ où $n_1$ est la taille de l'image d'entrée et $n_2$ celle de l'image de sortie.
