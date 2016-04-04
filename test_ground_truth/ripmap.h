@@ -15,44 +15,49 @@
 
 
 //gives the coordinates in the RipMap depending on the size of the rectangles (given by i,j)
-int coord(int i,int j,int u,int v,int w,int l){
+int coord(int i, int j,
+	int u, int v,
+	int w, int h, int l){
 	/*
 	 * i,j give the size of the rectangle
 	 * the largest rectangle representing the original image corresponds to i=j=0
 	 *
 	 * u,v are the coordinates in the original image
 	 * 
-	 * w is the width of the original image
+	 * w is the width of the original image, h its height
 	 * 
 	 * l is the current channel of color
 	 */
-	int x = good_modulus(u,w/pow(2,i));
-	int y = good_modulus(v,w/pow(2,j));
-	return (2*(1-1/pow(2,i))*w + 4*(1-1/pow(2,j))*w*w + x + y*2*w)*3+l;
+	int x = good_modulus(u,w/pow(2,i)),
+		y = good_modulus(v,h/pow(2,j));
+	int ir = 2*(1-1/pow(2,i))*w + x, //abscissa in the RipMap
+		jr = 2*(1-1/pow(2,j))*h + y; //ordinate in the RipMap
+	return (ir + 2*w*jr)*3+l;
 }
 
 
 
 //convolve horizontally by a gaussian kernel
-float gaussian_filter_h(float *r,int i,int j,int u,int v,int w,int l,float *g){
+float gaussian_filter_h(float *r,int i,int j,int u,int v,int w,int h,int l,float *g){
 	float a,b;
 	a = b = 0;
-	for(int f=0;f<TAPSR;f++){a += r[coord(i-1,j,2*u+f-(TAPSR-1)/2,v,w,l)]*g[f];}
-	for(int f=0;f<TAPSR;f++){b += r[coord(i-1,j,2*u+1+f-(TAPSR-1)/2,v,w,l)]*g[f];}
+	for(int f=0;f<TAPSR;f++){a += r[coord(i-1,j,2*u+f-(TAPSR-1)/2,v,w,h,l)]*g[f];}
+	for(int f=0;f<TAPSR;f++){b += r[coord(i-1,j,2*u+1+f-(TAPSR-1)/2,v,w,h,l)]*g[f];}
 	return (a+b)/2;
 }
 //convolve vertically by a gaussian kernel
-float gaussian_filter_v(float *r,int i,int j,int u,int v,int w,int l,float *g){
+float gaussian_filter_v(float *r,int i,int j,int u,int v,int w,int h,int l,float *g){
 	float a,b;
 	a = b = 0;
-	for(int f=0;f<TAPSR;f++){a += r[coord(i,j-1,u,2*v+f-(TAPSR-1)/2,w,l)]*g[f];}
-	for(int f=0;f<TAPSR;f++){b += r[coord(i,j-1,u,2*v+1+f-(TAPSR-1)/2,w,l)]*g[f];}
+	for(int f=0;f<TAPSR;f++){a += r[coord(i,j-1,u,2*v+f-(TAPSR-1)/2,w,h,l)]*g[f];}
+	for(int f=0;f<TAPSR;f++){b += r[coord(i,j-1,u,2*v+1+f-(TAPSR-1)/2,w,h,l)]*g[f];}
 	return (a+b)/2;
 }
 
 //build the RipMap
-void build_ripmap(float *img,float *r,int w,int h,int pd,int logw){
-	int l,ll,i,j,u,v,w1,w2;
+void build_ripmap(float *img,float *r,int w,int h,int pd){
+	int l,ll,i,j,u,v,w1,h2;
+	int logw = (int) log2(w);
 	
 	//1D gaussian kernel
 	float gauss1D[TAPSR];
@@ -68,7 +73,7 @@ void build_ripmap(float *img,float *r,int w,int h,int pd,int logw){
 		for(v=0;v<h;v++){
 			for(l=0;l<3;l++){
 				if(l>pd-1){ll=pd-1;}else{ll=l;}
-				r[coord(0,0,u,v,w,l)]=img[(u+v*w)*pd+ll];
+				r[coord(0,0,u,v,w,h,l)]=img[(u+v*w)*pd+ll];
 			}
 		}
 	}
@@ -77,9 +82,9 @@ void build_ripmap(float *img,float *r,int w,int h,int pd,int logw){
 	for(i=1;pow(2,i)<=w;i++){
 		w1=w/pow(2,i);
 		for(u=0;u<w1;u++){
-			for(v=0;v<w;v++){
+			for(v=0;v<h;v++){
 				for(l=0;l<3;l++){    
-					r[coord(i,0,u,v,w,l)] = gaussian_filter_h(r,i,0,u,v,w,l,gauss1D);
+					r[coord(i,0,u,v,w,h,l)] = gaussian_filter_h(r,i,0,u,v,w,h,l,gauss1D);
 				}
 			}
 		}
@@ -88,12 +93,12 @@ void build_ripmap(float *img,float *r,int w,int h,int pd,int logw){
 	//for each previous rectangle, compute the rectangles obtained by successive vertical zooms-out
 	for(i=0;pow(2,i)<=w;i++){
 		w1=w/pow(2,i);
-		for(j=1;pow(2,j)<=w;j++){
-			w2=w/pow(2,j);
+		for(j=1;pow(2,j)<=h;j++){
+			h2=h/pow(2,j);
 			for(u=0;u<w1;u++){
-				for(v=0;v<w2;v++){
+				for(v=0;v<h2;v++){
 					for(l=0;l<3;l++){
-						r[coord(i,j,u,v,w,l)] = gaussian_filter_v(r,i,j,u,v,w,l,gauss1D);
+						r[coord(i,j,u,v,w,h,l)] = gaussian_filter_v(r,i,j,u,v,w,h,l,gauss1D);
 					}
 				}
 			}
@@ -104,7 +109,7 @@ void build_ripmap(float *img,float *r,int w,int h,int pd,int logw){
 
 
 //the distance function is the smallest rectangle containing the pre-image (by the locally affine-approximated warping)
-//the rectangle is of size dh = |du/dx|+|du/dy| and dl = |dv/dx| + |dv/dy|
+//the rectangle is of size dw = |du/dx|+|du/dy| and dh = |dv/dx| + |dv/dy|
 
 
 // notations :
@@ -136,63 +141,65 @@ void precal_D(double H[3][3],double *D){
 
 
 //bilinear interpolation on the RipMap
-static float bilinear_ripmap(float *x, int w,
+static float bilinear_ripmap(float *x, int w, int h,
 		float p, float q, int l, int d1, int d2){
 	//a rectangle represent several pixels ; thus the coordinates p and q must be shifted
-	float pp = p - 1/2*(pow(2,d1)-1)/pow(2,d1);
-	float qq = q - 1/2*(pow(2,d2)-1)/pow(2,d2);
-	int ip = floor(p);
-	int iq = floor(q);
-	float a = x[coord(d1,d2,ip,iq,w,l)];
-	float b = x[coord(d1,d2,ip+1,iq,w,l)];
-	float c = x[coord(d1,d2,ip,iq+1,w,l)];
-	float dd = x[coord(d1,d2,ip+1,iq+1,w,l)];
+	//the center of the rectangle must be the coordinates on which to evaluate the image
+	float pp = p - 0.5*(pow(2,d1)-1)/pow(2,d1);
+	float qq = q - 0.5*(pow(2,d2)-1)/pow(2,d2);
+	int ip = floor(pp);
+	int iq = floor(qq);
+	float a = x[coord(d1,d2,ip,iq,w,h,l)];
+	float b = x[coord(d1,d2,ip+1,iq,w,h,l)];
+	float c = x[coord(d1,d2,ip,iq+1,w,h,l)];
+	float dd = x[coord(d1,d2,ip+1,iq+1,w,h,l)];
 	return evaluate_bilinear_cell(a, b, c, dd, pp-ip, qq-iq);
 }
 
 
-//la fonction principale. On a distingué beaucoup de cas suivant dh<=1, dh>=logw, etc...
+//la fonction principale. On a distingué beaucoup de cas suivant dw<=1, dw>=logw, etc...
 
 static float ripmap_interpolation_at(float *r, int w, int h,
 		float x, float y, int l,double d[2]){
 		int logw = (int) log2(w);
-		int dh = floor(log2(d[0])) + 1;
-		int dl = floor(log2(d[1])) + 1;
+		int logh = (int) log2(h);
+		int dw = floor(log2(d[0])) + 1;
+		int dh = floor(log2(d[1])) + 1;
 		float a,b,c,dd,u,v;
-		if((pow(2,dh))>w && (pow(2,dl)>w)){return r[coord(logw,logw,0,0,w,l)];}
-		if(dh<=1 && dl<=1){return bilinear_ripmap(r,w,x,y,l,0,0);}
-		if(pow(2,dh)>w){
-			if(dl<=1){return bilinear_ripmap(r,w,0,y,l,logw,0);}
+		if((pow(2,dw))>w && (pow(2,dh)>h)){return r[coord(logw,logh,0,0,w,h,l)];}
+		if(dw<=1 && dh<=1){return bilinear_ripmap(r,w,h,x,y,l,0,0);}
+		if(pow(2,dw)>w){
+			if(dh<=1){return bilinear_ripmap(r,w,h,0,y,l,logw,0);}
 			{
-				a=bilinear_ripmap(r,w,0,y/pow(2,dl-1),l,logw,dl-1);
-				b=bilinear_ripmap(r,w,0,y/pow(2,dl-2),l,logw,dl-2);
-				return (dl-log2(d[1]))*b + (log2(d[1])-dl+1)*a;
+				a=bilinear_ripmap(r,w,h,0,y/pow(2,dh-1),l,logw,dh-1);
+				b=bilinear_ripmap(r,w,h,0,y/pow(2,dh-2),l,logw,dh-2);
+				return (dh-log2(d[1]))*b + (log2(d[1])-dh+1)*a;
 			}
 		}
-		if(pow(2,dl)>w){
-			if(dh<=1){return bilinear_ripmap(r,w,x,0,l,0,logw);}
+		if(pow(2,dh)>h){
+			if(dw<=1){return bilinear_ripmap(r,w,h,x,0,l,0,logh);}
 			{
-				a=bilinear_ripmap(r,w,x/pow(2,dh-1),0,l,dh-1,logw);
-				b=bilinear_ripmap(r,w,x/pow(2,dh-2),0,l,dh-2,logw);
-				return (dh-log2(d[0]))*b + (log2(d[0])-dh+1)*a;
+				a=bilinear_ripmap(r,w,h,x/pow(2,dw-1),0,l,dw-1,logh);
+				b=bilinear_ripmap(r,w,h,x/pow(2,dw-2),0,l,dw-2,logh);
+				return (dw-log2(d[0]))*b + (log2(d[0])-dw+1)*a;
 			}
 		}
+		if(dw<=1){
+			a=bilinear_ripmap(r,w,h,x,y/pow(2,dh-1),l,0,dh-1);
+			b=bilinear_ripmap(r,w,h,x,y/pow(2,dh-2),l,0,dh-2);
+			return (dh-log2(d[1]))*b + (log2(d[1])-dh+1)*a;}
 		if(dh<=1){
-			a=bilinear_ripmap(r,w,x,y/pow(2,dl-1),l,0,dl-1);
-			b=bilinear_ripmap(r,w,x,y/pow(2,dl-2),l,0,dl-2);
-			return (dl-log2(d[1]))*b + (log2(d[1])-dl+1)*a;}
-		if(dl<=1){
-			a=bilinear_ripmap(r,w,x/pow(2,dh-1),y,l,dh-1,0);
-			b=bilinear_ripmap(r,w,x/pow(2,dh-2),y,l,dh-2,0);
-			return (dh-log2(d[0]))*b + (log2(d[0])-dh+1)*a;
+			a=bilinear_ripmap(r,w,h,x/pow(2,dw-1),y,l,dw-1,0);
+			b=bilinear_ripmap(r,w,h,x/pow(2,dw-2),y,l,dw-2,0);
+			return (dw-log2(d[0]))*b + (log2(d[0])-dw+1)*a;
 		
 		}
-		a=bilinear_ripmap(r,w,x/pow(2,dh-1),y/pow(2,dl-1),l,dh-1,dl-1);
-		b=bilinear_ripmap(r,w,x/pow(2,dh-2),y/pow(2,dl-1),l,dh-2,dl-1);
-		c=bilinear_ripmap(r,w,x/pow(2,dh-1),y/pow(2,dl-2),l,dh-1,dl-2);
-		dd=bilinear_ripmap(r,w,x/pow(2,dh-2),y/pow(2,dl-2),l,dh-2,dl-2);
-		u=(pow(2,dh)-d[0])/pow(2,dh);
-		v=(pow(2,dl)-d[1])/pow(2,dl);
+		a=bilinear_ripmap(r,w,h,x/pow(2,dw-1),y/pow(2,dh-1),l,dw-1,dh-1);
+		b=bilinear_ripmap(r,w,h,x/pow(2,dw-2),y/pow(2,dh-1),l,dw-2,dh-1);
+		c=bilinear_ripmap(r,w,h,x/pow(2,dw-1),y/pow(2,dh-2),l,dw-1,dh-2);
+		dd=bilinear_ripmap(r,w,h,x/pow(2,dw-2),y/pow(2,dh-2),l,dw-2,dh-2);
+		u=(pow(2,dw)-d[0])/pow(2,dw);
+		v=(pow(2,dh)-d[1])/pow(2,dh);
 		return u*v*dd + (1-u)*v*b + (1-v)*u*c + (1-u)*(1-v)*a;
 	}
 	
@@ -207,8 +214,7 @@ int apply_homo_ripmap(float *img,float *img_f,int w,int h,int w_out,int h_out,do
 
 //on va construire le ripmap de img.
 	float *ripmap=malloc(12*w*w*sizeof(float));
-	int logw = (int) log2(w);
-	build_ripmap(img,ripmap,w,h,3,logw);
+	build_ripmap(img,ripmap,w,h,3);
 
 
 	for (int j = 0; j < h_out; j++)
