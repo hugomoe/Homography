@@ -32,8 +32,16 @@ int main(int argc,char *argv[]){
 
 //zoom-in
 	float *img_zoomed = malloc(w*z*h*z*pd*sizeof(float));
+	if(img_zoomed==NULL){
+		printf("@zoom @main : img_zoomed is too large");
+		exit(1);
+	}
 	//symmetrize the input
 	float *img_sym = malloc(2*w*2*h*pd*sizeof(float));
+	if(img_sym==NULL){
+		printf("@zoom @main : img_sym is too large");
+		exit(1);
+	}
 	int i_sym, j_sym;
 	for(int l=0;l<pd;l++){
 		for(int i=0;i<2*w;i++){
@@ -43,7 +51,7 @@ int main(int argc,char *argv[]){
 			for(int j=0;j<2*h;j++){
 				j_sym = j-h/2;
 				if(j_sym<0){j_sym = -1-j_sym;}
-				else if(j_sym>w-1){j_sym = 2*h-1-j_sym;}
+				else if(j_sym>h-1){j_sym = 2*h-1-j_sym;}
 				img_sym[pd*(i+2*w*j)+l] = img[pd*(i_sym+w*j_sym)+l];
 			}
 		}
