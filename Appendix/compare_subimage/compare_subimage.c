@@ -88,7 +88,7 @@ int main(int argc,char *argv[]){
 	for(int l=0 ; l<pd1 ; l++)
 		for(int i=i_tl ; i<=i_br ; i++)
 			for(int j=j_tl ; j<=j_br ; j++){
-				idx = 3*(i+w1*j) + l;
+				idx = pd1*(i+w1*j) + l;
 
 				diff = fabs(img1[idx]-img2[idx]);
 				l1 += diff;

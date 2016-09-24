@@ -1,13 +1,13 @@
 %contient des exemples d'homographies traité par nous et ripmap
 
-\sse{Comparison between the Ripmap and the new geometric decomposition}
+\sse{Visual comparison between the Ripmap and the new geometric decomposition}
 %\sse{Comparaison du Ripmap et de la décomposition géométrique}
 
-This part briefly describes the experiments shown in figures \ref{Homo1}, \ref{Homo2}, \ref{Homo3}, \ref{Homo4}, \ref{Homo5} and \ref{Homo5det}.
+The previous part presented numerical results without showing where, on a given resampling, the geometric decomposition is better than the Ripmap. This part focuses on comparing the Ripmap and the geometric decomposition for different homographies (figures \ref{Homo1}, \ref{Homo2}, \ref{Homo3}, \ref{Homo4}, \ref{Homo5} and \ref{Homo5det}) to highlight where the geometric decomposition presents can be better than the Ripmap. Each time, the same homography is used to resample the same image using different methods.
 %Cette section décrit succintement les expériences représentées aux figures \ref{Homo1}, \ref{Homo2}, \ref{Homo3}, \ref{Homo4}, \ref{Homo5} et \ref{Homo5det}. On a choisit des homographies éloignées des cas dégénérés.
 
 
-One can notice that the decompostion reduces aliasing on some homographies (homographies 1, 4 and 5). For homographies squeezing the image in a diagonal direction, the decomposition reduces the blur (homography 2). Nevertheless for some homographies both the new method and the Ripmap give similar results (homography 3). 
+One can notice that the geometric decompostion can reduce aliasing (figures \ref{Homo1}, \ref{Homo4} and \ref{Homo5}). For homographies squeezing the image in a diagonal direction, the geometric decomposition reduces the blur (figure \ref{Homo2}). Nevertheless for some homographies both methods give similar results (figure \ref{Homo3}).
 
 
 %On peut remarquer que la décomposition permet pour certaines homographies de limiter l'\emph{aliasing} (Homographies 1, 4 et 5). Dans le cas d'une déformation en diagonale elle limite le flou (Homographie 2). Il existe néanmoins des cas où les deux méthodes ont des performances comparables (Homographie 3).
@@ -19,7 +19,7 @@ The execution time of the program was of about one second for an image of size $
 \begin{figure}
 \subfigure[Geometric decomposition]{\includegraphics[scale=0.4]{img_f_1.png}}
 \subfigure[Ripmap]{\includegraphics[scale=0.4]{img_ripmap_1.png}}
-\caption{Homography 1 : The geometric decomposition method creates less aliasing}
+\caption{The geometric decomposition method creates less aliasing}
 \label{Homo1}
 \end{figure}
 
@@ -33,7 +33,7 @@ The execution time of the program was of about one second for an image of size $
 \begin{figure}
 \subfigure[Geometric decomposition]{\includegraphics[scale=0.4]{img_f_2.png}}
 \subfigure[Ripmap]{\includegraphics[scale=0.4]{img_ripmap_2.png}}
-\caption{Homography 2 : The geometric decomposition method does not create excess blur (see section \ref{Ripmap}).}
+\caption{The geometric decomposition method does not create excessive blur (see section \ref{Ripmap}).}
 \label{Homo2}
 \end{figure}
 
@@ -50,7 +50,7 @@ The execution time of the program was of about one second for an image of size $
 \begin{figure}
 \subfigure[Geometric decomposition]{\includegraphics[scale=0.4]{img_f_3.png}}
 \subfigure[Ripmap]{\includegraphics[scale=0.4]{img_ripmap_3.png}}
-\caption{Homography 3 : None of the methods seems to clearly prevail, still the decomposition introduced a bit less aliasing.}
+\caption{None of the methods seems to clearly prevail, still the decomposition introduced a bit less aliasing.}
 \label{Homo3}
 \end{figure}
 
@@ -65,7 +65,7 @@ The execution time of the program was of about one second for an image of size $
 \begin{figure}
 \subfigure[Geometric decomposition]{\includegraphics[scale=0.4]{img_f_4.png}}
 \subfigure[Ripmap]{\includegraphics[scale=0.4]{img_ripmap_4.png}}
-\caption{Homography 4 : The geometric decomposition method creates less aliasing.}
+\caption{ The geometric decomposition method creates less aliasing.}
 \label{Homo4}
 \end{figure}
 
@@ -83,7 +83,7 @@ The execution time of the program was of about one second for an image of size $
 \subfigure[Ripmap]{\includegraphics[scale=0.4]{img_ripmap_5.png}}
 \subfigure[Naive method]{\includegraphics[scale=0.4]{img_naive_5.png}}
 \subfigure[Mipmap]{\includegraphics[scale=0.4]{img_mipmap_5.png}}
-\caption{Homography 5 : The geometric decomposition method creates less aliasing. See the detail on figure \ref{Homo5det}.}
+\caption{The geometric decomposition method creates less aliasing. See the detail on figure \ref{Homo5det}.}
 \label{Homo5}
 \end{figure}
 
@@ -103,7 +103,7 @@ The execution time of the program was of about one second for an image of size $
 \subfigure[Mipmap]{\includegraphics[scale=1.25]{img_det_mipmap.png}}\hfill
 \subfigure[Ripmap]{\includegraphics[scale=1.25]{img_det_ripmap.png}}\hfill
 \subfigure[Geometric decomposition]{\includegraphics[scale=1.25]{img_det_geo.png}}
-\caption{Detail of homography 5 from figure \ref{Homo5} }
+\caption{Detail from figure \ref{Homo5} }
 \label{Homo5det}
 \end{figure}
 
